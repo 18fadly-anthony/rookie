@@ -19,6 +19,7 @@ def main():
     parser.add_argument('--list-packages', metavar='', help='List packages')
     parser.add_argument('--list-definitions', metavar='', help='List package definitions')
     parser.add_argument('--list-generations', metavar='', help='List generations')
+    parser.add_argument('--switch', metavar='', nargs=1, type=int, default=0, help='switch <generation> - switch to generation')
 
     args = parser.parse_args()
 
