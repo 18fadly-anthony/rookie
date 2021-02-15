@@ -25,12 +25,30 @@ def validate_url(url):
     return(re.match(regex, url) is not None)
 
 
+def file_append(filename, contents):
+    f = open(filename, "a")
+    f.write(contents)
+    f.close()
+
+
+def file_overwrite(filename, contents):
+    f = open(filename, "w")
+    f.write(contents)
+    f.close()
+
+
+def file_read(filename):
+    f = open(filename, "r")
+    return f.read()
+
+
 # Define Package Manager Functions
 def init():
     mkdirexists(home + "/.rookie")
     mkdirexists(home + "/.rookie/definitions")
     mkdirexists(home + "/.rookie/generations")
     mkdirexists(home + "/.rookie/store")
+    file_overwrite(home + "/.rookie/current_generation", "0")
 
 
 def create(q):
@@ -38,7 +56,10 @@ def create(q):
     if os.path.isdir(home + "/.rookie/definitions"):
         if q[1] in valid_package_types:
             if validate_url(q[2]):
-                pass
+                mkdirexists(home + "/.rookie/definitions/" + q[0])
+                file_overwrite(home + "/.rookie/definitions/" + q[0] + "/name", q[0])
+                file_overwrite(home + "/.rookie/definitions/" + q[0] + "/type", q[1])
+                file_overwrite(home + "/.rookie/definitions/" + q[0] + "/url", q[2])
             else:
                 print("Error: url is not valid")
         else:
