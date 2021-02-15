@@ -107,8 +107,9 @@ def install_package(package):
 
             new_gen = gendir + str(len(os.listdir(gendir)))
 
-            if not os.path.isfile(new_gen + "/" + package_name):
-                os.symlink(package_store_dir + "/latest", new_gen + "/" + package_name)
+            if os.path.isfile(new_gen + "/" + package_name):
+                os.remove(new_gen + "/" + package_name)
+            os.symlink(package_store_dir + "/latest", new_gen + "/" + package_name)
             file_overwrite(home + "/.rookie/current_generation", new_gen)
 
             if os.path.isdir(rookiedir + "/bin"):
@@ -140,7 +141,9 @@ def update_script(package):
     if not os.path.isfile(package_store_dir + "/" + package_hash + "/bin/" + package_name):
         shutil.move(rookiedir + "/tmp/" + package_name, package_store_dir + "/" + package_hash + "/bin/" + package_name)
         os.chmod(package_store_dir + "/" + package_hash + "/bin/" + package_name, 0o777)
-        os.symlink(package_store_dir + "/" + package_hash + "/bin/" + package_name, package_store_dir + "/latest")
+    if os.path.isfile(package_store_dir + "/latest"):
+        os.remove(package_store_dir + "/latest")
+    os.symlink(package_store_dir + "/" + package_hash + "/bin/" + package_name, package_store_dir + "/latest")
 
     install_package(package) # Call install again after the package has been updated
 
