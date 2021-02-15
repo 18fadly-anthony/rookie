@@ -95,17 +95,20 @@ def install_package(package):
     # Validate package defined
     if os.path.isdir(home + "/.rookie/definitions/" + package[0]):
         if os.path.isdir(home + "/.rookie/store/" + package[0]):
+
             package_name = package[0]
             package_store_dir = rookiedir + "/store/" + package_name
 
             gendir = rookiedir + "/generations/"
-            if os.path.isdir(rookiedir + "/generations/" + file_read(rookiedir + "/current_generation")):
-                copy_tree(gendir + file_read(rookiedir + "/current_generation"), gendir + str(len(os.listdir(gendir)) + 1))
+            if os.path.isdir(file_read(rookiedir + "/current_generation")):
+                copy_tree(file_read(rookiedir + "/current_generation"), gendir + str(len(os.listdir(gendir)) + 1))
             else:
                 mkdirexists(gendir + str(len(os.listdir(gendir)) + 1))
 
             new_gen = gendir + str(len(os.listdir(gendir)))
-            os.symlink(package_store_dir + "/latest", new_gen + "/" + package_name)
+
+            if not os.path.isfile(new_gen + "/" + package_name):
+                os.symlink(package_store_dir + "/latest", new_gen + "/" + package_name)
             file_overwrite(home + "/.rookie/current_generation", new_gen)
 
             if os.path.isdir(rookiedir + "/bin"):
