@@ -16,6 +16,9 @@ def main():
     parser.add_argument('--sync-all', metavar='', help='Sync all installed packages')
     parser.add_argument('--remove', metavar='', nargs=1, type=str, default="", help='<package> - Remove <package>')
     parser.add_argument('--purge', metavar='', nargs=1, type=str, default="", help='<package> - Remove <package> definition')
+    parser.add_argument('--list-packages', metavar='', help='List packages')
+    parser.add_argument('--list-definitions', metavar='', help='List package definitions')
+    parser.add_argument('--list-generations', metavar='', help='List generations')
 
     args = parser.parse_args()
 
