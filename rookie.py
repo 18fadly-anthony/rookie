@@ -91,6 +91,14 @@ def create(q):
         print("Error: please run --init first")
 
 
+def make_new_generation():
+    gendir = rookiedir + "/generations/"
+    if os.path.isdir(file_read(rookiedir + "/current_generation")):
+        copy_tree(file_read(rookiedir + "/current_generation"), gendir + str(len(os.listdir(gendir)) + 1))
+    else:
+        mkdirexists(gendir + str(len(os.listdir(gendir)) + 1))
+
+
 def install_package(package):
     # Validate package defined
     if os.path.isdir(home + "/.rookie/definitions/" + package[0]):
@@ -100,10 +108,8 @@ def install_package(package):
             package_store_dir = rookiedir + "/store/" + package_name
 
             gendir = rookiedir + "/generations/"
-            if os.path.isdir(file_read(rookiedir + "/current_generation")):
-                copy_tree(file_read(rookiedir + "/current_generation"), gendir + str(len(os.listdir(gendir)) + 1))
-            else:
-                mkdirexists(gendir + str(len(os.listdir(gendir)) + 1))
+
+            make_new_generation()
 
             new_gen = gendir + str(len(os.listdir(gendir)))
 
