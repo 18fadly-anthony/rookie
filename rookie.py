@@ -171,11 +171,8 @@ def main():
     parser.add_argument('--install', metavar='<package>', nargs=1, type=str, default="", help='Install <package>')
     parser.add_argument('--update', metavar='<package>', nargs=1, type=str, default="", help='Update <package>')
     parser.add_argument('--remove', metavar='<package>', nargs=1, type=str, default="", help='Remove <package>')
-    parser.add_argument('--remove-store', metavar='<package>', nargs=1, type=str, default="", help='Remove <package> and remove it from the store')
-    parser.add_argument('--remove-definition', metavar='<package>', nargs=1, type=str, default="", help='Remove <package>, and remove it from the store, and remove its definition')
     parser.add_argument('--list-packages', metavar='', help='List packages')
     parser.add_argument('--list-definitions', metavar='', help='List package definitions')
-    parser.add_argument('--list-generations', metavar='', help='List generations')
     parser.add_argument('--switch', metavar='<generation>', nargs=1, type=int, default=0, help='Switch to <generation>')
 
     args = parser.parse_args()
