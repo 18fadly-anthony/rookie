@@ -99,6 +99,13 @@ def make_new_generation():
         mkdirexists(gendir + str(len(os.listdir(gendir)) + 1))
 
 
+def switch_to_generation(new_gen):
+    file_overwrite(home + "/.rookie/current_generation", new_gen)
+    if os.path.isdir(rookiedir + "/bin"):
+        os.remove(rookiedir + "/bin")
+    os.symlink(new_gen, rookiedir + "/bin")
+
+
 def install_package(package):
     # Validate package defined
     if os.path.isdir(home + "/.rookie/definitions/" + package[0]):
@@ -116,11 +123,9 @@ def install_package(package):
             if os.path.isfile(new_gen + "/" + package_name):
                 os.remove(new_gen + "/" + package_name)
             os.symlink(package_store_dir + "/latest", new_gen + "/" + package_name)
-            file_overwrite(home + "/.rookie/current_generation", new_gen)
 
-            if os.path.isdir(rookiedir + "/bin"):
-                os.remove(rookiedir + "/bin")
-            os.symlink(new_gen, rookiedir + "/bin")
+            switch_to_generation(new_gen)
+
         else:
             update_package(package)
     else:
