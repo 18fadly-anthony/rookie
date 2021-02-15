@@ -12,7 +12,7 @@ def main():
         epilog="""Copyright (C) TODO placeholder put something here""")
 
     parser.add_argument('--create', metavar='', nargs=3, type=str, default="", help='<package> <type> <url>')
-    parser.add_argument('--install', metavar='', nargs=1, type=str, default="", help='<package>')
+    parser.add_argument('--sync', metavar='', nargs=1, type=str, default="", help='<package>')
 
     args = parser.parse_args()
 
