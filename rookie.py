@@ -14,6 +14,8 @@ def main():
     parser.add_argument('--create', metavar='', nargs=3, type=str, default="", help='<package> <type> <url> - Define <package> of <type> [script, tarball, appimage], with <url>')
     parser.add_argument('--sync', metavar='', nargs=1, type=str, default="", help='<package> - Sync (install and upgrade) <package>')
     parser.add_argument('--sync-all', metavar='', help='Sync all installed packages')
+    parser.add_argument('--remove', metavar='', nargs=1, type=str, default="", help='<package> - Remove <package>')
+    parser.add_argument('--purge', metavar='', nargs=1, type=str, default="", help='<package> - Remove <package> definition')
 
     args = parser.parse_args()
 
