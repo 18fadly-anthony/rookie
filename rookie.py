@@ -159,6 +159,14 @@ def update_script(package):
     install_package(package) # Call install again after the package has been updated
 
 
+def list_packages():
+    package_list = os.listdir(rookiedir + "/bin")
+    print("There are " + str(len(package_list)) + " packages installed:")
+    print()
+    for i in package_list:
+        print(i)
+
+
 def main():
 
     # Define Arguments
@@ -172,12 +180,14 @@ def main():
     parser.add_argument('--update', metavar='<package>', nargs=1, type=str, default="", help='Update <package>')
     parser.add_argument('--upgrade', action='store_true', help='update all packages')
     parser.add_argument('--remove', metavar='<package>', nargs=1, type=str, default="", help='Remove <package>')
-    parser.add_argument('--list-packages', metavar='', help='List packages')
-    parser.add_argument('--list-definitions', metavar='', help='List package definitions')
-    parser.add_argument('--list-generations', metavar='', help='List generations')
+    parser.add_argument('--list-packages', action='store_true', help='List packages')
+    parser.add_argument('--list-definitions', action='store_true', help='List package definitions')
+    parser.add_argument('--list-generations', action='store_true', help='List generations')
     parser.add_argument('--switch', metavar='<generation>', nargs=1, type=int, default=0, help='Switch to <generation>')
 
     args = parser.parse_args()
+
+    # print(args) # For testing
 
     # After arguments defined
     if args.init:
@@ -191,6 +201,9 @@ def main():
 
     elif args.update != '':
         update_package(args.update)
+
+    elif args.list_packages:
+        list_packages()
 
 
 if __name__ == "__main__":
