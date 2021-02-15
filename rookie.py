@@ -6,6 +6,7 @@ import re
 import requests
 import hashlib
 import shutil
+from distutils.dir_util import copy_tree
 
 home = os.path.expanduser('~')
 rookiedir = home + "/.rookie"
@@ -94,7 +95,22 @@ def install_package(package):
     # Validate package defined
     if os.path.isdir(home + "/.rookie/definitions/" + package[0]):
         if os.path.isdir(home + "/.rookie/store/" + package[0]):
-            pass
+            package_name = package[0]
+            package_store_dir = rookiedir + "/store/" + package_name
+
+            gendir = rookiedir + "/generations/"
+            if os.path.isdir(rookiedir + "/generations/" + file_read(rookiedir + "/current_generation")):
+                copy_tree(gendir + file_read(rookiedir + "/current_generation"), gendir + str(len(os.listdir(gendir)) + 1))
+            else:
+                mkdirexists(gendir + str(len(os.listdir(gendir)) + 1))
+
+            new_gen = gendir + str(len(os.listdir(gendir)))
+            os.symlink(package_store_dir + "/latest", new_gen + "/" + package_name)
+            file_overwrite(home + "/.rookie/current_generation", new_gen)
+
+            if os.path.isdir(rookiedir + "/bin"):
+                os.remove(rookiedir + "/bin")
+            os.symlink(new_gen, rookiedir + "/bin")
         else:
             update_package(package)
     else:
@@ -120,7 +136,11 @@ def update_script(package):
 
     shutil.move(rookiedir + "/tmp/" + package_name, package_store_dir + "/" + package_hash + "/bin/" + package_name)
 
-    #install_package(package) # Call install again after the package has been updated
+    os.chmod(package_store_dir + "/" + package_hash + "/bin/" + package_name, 0o777)
+
+    os.symlink(package_store_dir + "/" + package_hash + "/bin/" + package_name, package_store_dir + "/latest")
+
+    install_package(package) # Call install again after the package has been updated
 
 
 def main():
