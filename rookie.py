@@ -2,6 +2,7 @@
 
 import os
 import argparse
+import re
 
 home = os.path.expanduser('~')
 
@@ -10,6 +11,18 @@ home = os.path.expanduser('~')
 def mkdirexists(dir):
     if not(os.path.isdir(dir)):
         os.mkdir(dir)
+
+
+def validate_url(url):
+    regex = re.compile(
+        r'^(?:http|ftp)s?://' # http:// or https://
+        r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|' #domain...
+        r'localhost|' #localhost...
+        r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' # ...or ip
+        r'(?::\d+)?' # optional port
+        r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+
+    return(re.match(regex, url) is not None)
 
 
 # Define Package Manager Functions
@@ -24,7 +37,10 @@ def create(q):
     valid_package_types = ["script"] # TODO add appimage,tarball, git
     if os.path.isdir(home + "/.rookie/definitions"):
         if q[1] in valid_package_types:
-            pass
+            if validate_url(q[2]):
+                pass
+            else:
+                print("Error: url is not valid")
         else:
             print("Error, that is not a valid package type, the valid package types are: " + str(valid_package_types))
     else:
