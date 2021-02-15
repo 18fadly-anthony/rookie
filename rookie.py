@@ -22,7 +22,13 @@ def init():
 
 def create(q):
     valid_package_types = ["script"] # TODO add appimage,tarball, git
-    # mkdirexists(home + "/.rookie/definitions/" + q[0]) # TODO validate type and url before creating generation
+    if os.path.isdir(home + "/.rookie/definitions"):
+        if q[1] in valid_package_types:
+            pass
+        else:
+            print("Error, that is not a valid package type, the valid package types are: " + str(valid_package_types))
+    else:
+        print("Error: please run --init first")
 
 
 def main():
@@ -50,7 +56,7 @@ def main():
     if args.init:
         init()
 
-    if args.create != '':
+    elif args.create != '':
         create(args.create)
 
 
