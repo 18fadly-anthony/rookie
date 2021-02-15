@@ -137,11 +137,10 @@ def update_script(package):
     mkdirexists(package_store_dir + "/" + package_hash)
     mkdirexists(package_store_dir + "/" + package_hash + "/bin")
 
-    shutil.move(rookiedir + "/tmp/" + package_name, package_store_dir + "/" + package_hash + "/bin/" + package_name)
-
-    os.chmod(package_store_dir + "/" + package_hash + "/bin/" + package_name, 0o777)
-
-    os.symlink(package_store_dir + "/" + package_hash + "/bin/" + package_name, package_store_dir + "/latest")
+    if not os.path.isfile(package_store_dir + "/" + package_hash + "/bin/" + package_name):
+        shutil.move(rookiedir + "/tmp/" + package_name, package_store_dir + "/" + package_hash + "/bin/" + package_name)
+        os.chmod(package_store_dir + "/" + package_hash + "/bin/" + package_name, 0o777)
+        os.symlink(package_store_dir + "/" + package_hash + "/bin/" + package_name, package_store_dir + "/latest")
 
     install_package(package) # Call install again after the package has been updated
 
@@ -176,6 +175,9 @@ def main():
 
     elif args.install != '':
         install_package(args.install)
+
+    elif args.update != '':
+        update_package(args.update)
 
 
 if __name__ == "__main__":
