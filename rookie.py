@@ -3,8 +3,10 @@
 import os
 import argparse
 import re
+import urllib.request
 
 home = os.path.expanduser('~')
+rookiedir = home + "/.rookie"
 
 
 # Define General Functions
@@ -68,6 +70,31 @@ def create(q):
         print("Error: please run --init first")
 
 
+def install_package(package):
+    # Validate package defined
+    if os.path.isdir(home + "/.rookie/definitions/" + package[0]):
+        if os.path.isdir(home + "/.rookie/store/" + package[0]):
+            pass
+        else:
+            update_package(package)
+    else:
+        print("Error: " + package[0] + " is not defined, try: --create")
+
+
+def update_package(package):
+    package_name = package[0]
+    if file_read(rookiedir + "/definitions/" + package_name + "/type") == "script":
+        update_script(package)
+
+
+def update_script(package):
+    package_name = package[0]
+    mkdirexists(rookiedir + "/store/" + package_name)
+    print(file_read(rookiedir + "/definitions/" + package_name + "/url"))
+    urllib.request.urlretrieve(file_read(rookiedir + "/definitions/" + package_name + "/url"), rookiedir + "/store/" + package_name + "/" + package_name)
+    install_package(package) # Call install again after the package has been updated
+
+
 def main():
 
     # Define Arguments
@@ -95,6 +122,9 @@ def main():
 
     elif args.create != '':
         create(args.create)
+
+    elif args.install != '':
+        install_package(args.install)
 
 
 if __name__ == "__main__":
