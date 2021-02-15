@@ -170,6 +170,7 @@ def main():
     parser.add_argument('--create', metavar=('<package>', '<type>', '<url>'), nargs=3, type=str, default="", help='Define <package> of <type> [script, tarball, appimage], with <url>')
     parser.add_argument('--install', metavar='<package>', nargs=1, type=str, default="", help='Install <package>')
     parser.add_argument('--update', metavar='<package>', nargs=1, type=str, default="", help='Update <package>')
+    parser.add_argument('--upgrade', action='store_true', help='update all packages')
     parser.add_argument('--remove', metavar='<package>', nargs=1, type=str, default="", help='Remove <package>')
     parser.add_argument('--list-packages', metavar='', help='List packages')
     parser.add_argument('--list-definitions', metavar='', help='List package definitions')
