@@ -3,7 +3,7 @@
 import os
 import argparse
 import re
-import urllib.request
+import requests
 
 home = os.path.expanduser('~')
 rookiedir = home + "/.rookie"
@@ -43,6 +43,11 @@ def file_read(filename):
     f = open(filename, "r")
     return f.read()
 
+def download_file(url, dest_path):
+    r = requests.get(url)
+
+    with open(dest_path, 'wb') as f:
+        f.write(r.content)
 
 # Define Package Manager Functions
 def init():
@@ -90,7 +95,7 @@ def update_package(package):
 
 def update_script(package):
     package_name = package[0]
-    urllib.request.urlretrieve(file_read(rookiedir + "/definitions/" + package_name + "/url"), rookiedir + "/tmp/" + "/" + package_name)
+    download_file(file_read(rookiedir + "/definitions/" + package_name + "/url"), rookiedir + "/tmp/" + "/" + package_name)
     #install_package(package) # Call install again after the package has been updated
 
 
