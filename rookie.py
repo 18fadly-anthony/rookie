@@ -11,8 +11,10 @@ def main():
         description='''RookiePM: The Rookie Package Manager''',
         epilog="""Copyright (C) TODO placeholder put something here""")
 
-    # parser.add_argument('--foo', type=int, default=42, help='FOO!')
-    # parser.add_argument('bar', nargs='*', default=[1, 2, 3], help='BAR!')
+    parser.add_argument('--foo', type=int, default=42, help='FOO!')
+    parser.add_argument('bar', nargs='*', default=[1, 2, 3], help='BAR!')
+
+    parser.add_argument('create', help='test')
 
     args=parser.parse_args()
 
