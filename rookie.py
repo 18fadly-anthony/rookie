@@ -50,6 +50,7 @@ def init():
     mkdirexists(home + "/.rookie/definitions")
     mkdirexists(home + "/.rookie/generations")
     mkdirexists(home + "/.rookie/store")
+    mkdirexists(home + "/.rookie/tmp")
     file_overwrite(home + "/.rookie/current_generation", "0")
 
 
@@ -89,10 +90,8 @@ def update_package(package):
 
 def update_script(package):
     package_name = package[0]
-    mkdirexists(rookiedir + "/store/" + package_name)
-    print(file_read(rookiedir + "/definitions/" + package_name + "/url"))
-    urllib.request.urlretrieve(file_read(rookiedir + "/definitions/" + package_name + "/url"), rookiedir + "/store/" + package_name + "/" + package_name)
-    install_package(package) # Call install again after the package has been updated
+    urllib.request.urlretrieve(file_read(rookiedir + "/definitions/" + package_name + "/url"), rookiedir + "/tmp/" + "/" + package_name)
+    #install_package(package) # Call install again after the package has been updated
 
 
 def main():
