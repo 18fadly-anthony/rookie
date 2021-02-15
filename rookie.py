@@ -4,6 +4,8 @@ import os
 import argparse
 import re
 import requests
+import hashlib
+import shutil
 
 home = os.path.expanduser('~')
 rookiedir = home + "/.rookie"
@@ -48,6 +50,18 @@ def download_file(url, dest_path):
 
     with open(dest_path, 'wb') as f:
         f.write(r.content)
+
+
+def hash_file(filename):
+    BLOCKSIZE = 65536
+    hasher = hashlib.sha1()
+    with open(filename, 'rb') as afile:
+        buf = afile.read(BLOCKSIZE)
+        while len(buf) > 0:
+            hasher.update(buf)
+            buf = afile.read(BLOCKSIZE)
+    return hasher.hexdigest()
+
 
 # Define Package Manager Functions
 def init():
@@ -95,7 +109,17 @@ def update_package(package):
 
 def update_script(package):
     package_name = package[0]
-    download_file(file_read(rookiedir + "/definitions/" + package_name + "/url"), rookiedir + "/tmp/" + "/" + package_name)
+    download_file(file_read(rookiedir + "/definitions/" + package_name + "/url"), rookiedir + "/tmp/" + package_name)
+
+    package_store_dir = rookiedir + "/store/" + package_name
+
+    mkdirexists(package_store_dir)
+    package_hash = hash_file(rookiedir + "/tmp/" + package_name)
+    mkdirexists(package_store_dir + "/" + package_hash)
+    mkdirexists(package_store_dir + "/" + package_hash + "/bin")
+
+    shutil.move(rookiedir + "/tmp/" + package_name, package_store_dir + "/" + package_hash + "/bin/" + package_name)
+
     #install_package(package) # Call install again after the package has been updated
 
 
