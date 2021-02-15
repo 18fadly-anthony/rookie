@@ -161,9 +161,17 @@ def update_script(package):
 
 def list_packages():
     package_list = os.listdir(rookiedir + "/bin")
-    print("There are " + str(len(package_list)) + " packages installed:")
+    print("There are " + str(len(package_list)) + " package(s) installed:")
     print()
     for i in package_list:
+        print(i)
+
+
+def list_definitions():
+    def_list = os.listdir(rookiedir + "/definitions")
+    print("There are " + str(len(def_list)) + " package(s) defined")
+    print()
+    for i in def_list:
         print(i)
 
 
@@ -204,6 +212,9 @@ def main():
 
     elif args.list_packages:
         list_packages()
+
+    elif args.list_definitions:
+        list_definitions()
 
 
 if __name__ == "__main__":
