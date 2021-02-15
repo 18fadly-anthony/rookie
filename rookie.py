@@ -1,7 +1,19 @@
 #!/usr/bin/env python3
 
-import sys
+import os
 import argparse
+
+home = os.path.expanduser('~')
+
+def mkdirexists(dir):
+    if not(os.path.isdir(dir)):
+        os.mkdir(dir)
+
+
+def init():
+    mkdirexists(home + "/.rookie")
+    mkdirexists(home + "/.rookie/definitions")
+    mkdirexists(home + "/.rookie/generations")
 
 
 def main():
@@ -11,6 +23,7 @@ def main():
         description='''RookiePM: The Rookie Package Manager''',
         epilog="""Copyright (C) TODO placeholder put something here""")
 
+    parser.add_argument('--init', action='store_true', help='Setup RookiePM')
     parser.add_argument('--create', metavar=('<package>', '<type>', '<url>'), nargs=3, type=str, default="", help='Define <package> of <type> [script, tarball, appimage], with <url>')
     parser.add_argument('--sync', metavar='<package>', nargs=1, type=str, default="", help='Sync (install and upgrade) <package>')
     parser.add_argument('--sync-all', metavar='', help='Sync all installed packages')
@@ -23,6 +36,9 @@ def main():
     parser.add_argument('--gc', metavar='', help='Garbage collect (delete) all past generation')
 
     args = parser.parse_args()
+
+    if args.init:
+        init()
 
 
 if __name__ == "__main__":
