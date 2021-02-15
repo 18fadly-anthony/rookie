@@ -5,6 +5,7 @@ import argparse
 
 home = os.path.expanduser('~')
 
+
 def mkdirexists(dir):
     if not(os.path.isdir(dir)):
         os.mkdir(dir)
@@ -14,6 +15,10 @@ def init():
     mkdirexists(home + "/.rookie")
     mkdirexists(home + "/.rookie/definitions")
     mkdirexists(home + "/.rookie/generations")
+
+
+def create(q):
+    mkdirexists(home + "/.rookie/definitions/" + q[0])
 
 
 def main():
@@ -37,8 +42,12 @@ def main():
 
     args = parser.parse_args()
 
+    # After arguments defined
     if args.init:
         init()
+
+    if args.create != '':
+        create(args.create)
 
 
 if __name__ == "__main__":
