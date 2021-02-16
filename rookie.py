@@ -219,6 +219,7 @@ def list_definitions():
 def list_generations():
     gen_list = os.listdir(rookiedir + "/generations")
     gen_list.sort(key=int)
+    current_gen = file_read(rookiedir + "/current_generation")
     print("There are " + str(len(gen_list)) + " generation(s):")
     print()
     for i in gen_list:
@@ -226,6 +227,8 @@ def list_generations():
         sys.stdout.write(i + ": ")
         for j in packages_in_gen:
             sys.stdout.write(j + " ")
+        if rookiedir + "/generations/" + i == current_gen:
+            sys.stdout.write("(current)")
         print()
 
 
