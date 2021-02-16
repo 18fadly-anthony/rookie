@@ -115,22 +115,16 @@ def install_package(package):
     # Validate package defined
     if os.path.isdir(home + "/.rookie/definitions/" + package[0]):
         if os.path.isdir(home + "/.rookie/store/" + package[0]):
-
             package_name = package[0]
             package_store_dir = rookiedir + "/store/" + package_name
-
             gendir = rookiedir + "/generations/"
-
             make_new_generation()
-
             new_gen = gendir + str(len(os.listdir(gendir)))
-
             if os.path.isfile(new_gen + "/" + package_name):
                 os.remove(new_gen + "/" + package_name)
             os.symlink(package_store_dir + "/latest", new_gen + "/" + package_name)
-
             switch_to_generation(new_gen)
-
+            file_overwrite(file_read(package_store_dir + "/latest_hash") + "/reference", new_gen)
         else:
             update_package(package)
     else:
@@ -174,6 +168,7 @@ def update_appimage(package):
     if os.path.isfile(package_store_dir + "/latest"):
         os.remove(package_store_dir + "/latest")
     os.symlink(package_store_dir + "/" + package_hash + "/bin/" + package_name, package_store_dir + "/latest")
+    file_overwrite(package_store_dir + "/latest_hash", package_store_dir + "/" + package_hash)
     install_package(package) # Call install again after the package has been updated
 
 
@@ -195,6 +190,7 @@ def update_script(package):
         os.remove(rookiedir + "/tmp/" + package_name)
     if os.path.isfile(package_store_dir + "/latest"):
         os.remove(package_store_dir + "/latest")
+    file_overwrite(package_store_dir + "/latest_hash", package_store_dir + "/" + package_hash)
     os.symlink(package_store_dir + "/" + package_hash + "/bin/" + package_name, package_store_dir + "/latest")
 
     install_package(package) # Call install again after the package has been updated
