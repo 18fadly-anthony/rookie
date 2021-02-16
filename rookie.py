@@ -105,7 +105,7 @@ def make_new_generation():
 
 
 def switch_to_generation(new_gen):
-    file_overwrite(home + "/.rookie/current_generation", new_gen)
+    file_overwrite(rookiedir + "/current_generation", new_gen)
     if os.path.isdir(rookiedir + "/bin"):
         os.remove(rookiedir + "/bin")
     os.symlink(new_gen, rookiedir + "/bin")
