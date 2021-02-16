@@ -75,7 +75,7 @@ def init():
 
 
 def create(q):
-    valid_package_types = ["script"] # TODO add appimage,tarball, git
+    valid_package_types = ["script", "appimage"]
     if os.path.isdir(home + "/.rookie/definitions"):
         if q[1] in valid_package_types:
             if validate_url(q[2]):
@@ -136,6 +136,40 @@ def update_package(package):
     package_name = package[0]
     if file_read(rookiedir + "/definitions/" + package_name + "/type") == "script":
         update_script(package)
+    if file_read(rookiedir + "/definitions/" + package_name + "/type") == "appimage":
+        update_appimage(package)
+
+
+def create_appimage_wrapper(wrapper_path, appimage_path):
+    file_overwrite(wrapper_path, '#!/bin/sh')
+    file_append(wrapper_path, '\n')
+    file_append(wrapper_path, 'appimage-run ' + appimage_path)
+
+
+def update_appimage(package):
+    package_name = package[0]
+    download_file(file_read(rookiedir + "/definitions/" + package_name + "/url"), rookiedir + "/tmp/" + package_name)
+    package_store_dir = rookiedir + "/store/" + package_name
+    mkdirexists(package_store_dir)
+    package_hash = hash_file(rookiedir + "/tmp/" + package_name)
+    mkdirexists(package_store_dir + "/" + package_hash)
+    mkdirexists(package_store_dir + "/" + package_hash + "/bin")
+
+    if not os.path.isfile(package_store_dir + "/" + package_hash + "/" + package_name):
+        shutil.move(rookiedir + "/tmp/" + package_name, package_store_dir + "/" + package_hash + "/" + package_name + ".appimage")
+        wrapper_path = package_store_dir + "/" + package_hash + "/bin/" + package_name
+        appimage_path = package_store_dir + "/" + package_hash + "/" + package_name + ".appimage"
+
+        create_appimage_wrapper(wrapper_path, appimage_path)
+
+        os.chmod(wrapper_path, 0o777)
+    else:
+        os.remove(rookiedir + "/tmp/" + package_name)
+
+    if os.path.isfile(package_store_dir + "/latest"):
+        os.remove(package_store_dir + "/latest")
+    os.symlink(package_store_dir + "/" + package_hash + "/bin/" + package_name, package_store_dir + "/latest")
+    install_package(package) # Call install again after the package has been updated
 
 
 def update_script(package):
@@ -152,6 +186,8 @@ def update_script(package):
     if not os.path.isfile(package_store_dir + "/" + package_hash + "/bin/" + package_name):
         shutil.move(rookiedir + "/tmp/" + package_name, package_store_dir + "/" + package_hash + "/bin/" + package_name)
         os.chmod(package_store_dir + "/" + package_hash + "/bin/" + package_name, 0o777)
+    else:
+        os.remove(rookiedir + "/tmp/" + package_name)
     if os.path.isfile(package_store_dir + "/latest"):
         os.remove(package_store_dir + "/latest")
     os.symlink(package_store_dir + "/" + package_hash + "/bin/" + package_name, package_store_dir + "/latest")
