@@ -182,6 +182,17 @@ def list_generations():
     print(gen_list)
 
 
+def remove(package):
+    package_name = package[0]
+    package_list = os.listdir(rookiedir + "/bin")
+    gendir = rookiedir + "/generations/"
+    if package_name in package_list:
+        make_new_generation()
+        new_gen = gendir + str(len(os.listdir(gendir)))
+        os.remove(new_gen + "/" + package_name)
+    switch_to_generation(new_gen)
+
+
 def main():
 
     # Define Arguments
@@ -228,6 +239,9 @@ def main():
 
     elif args.switch != 0:
         switch_to_generation(rookiedir + "/generations/" + str(args.switch[0]))
+
+    elif args.remove != '':
+        remove(args.remove)
 
 
 if __name__ == "__main__":
