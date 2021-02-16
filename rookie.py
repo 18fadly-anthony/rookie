@@ -95,8 +95,8 @@ def create(q):
 def make_new_generation():
     gendir = rookiedir + "/generations/"
 
-    mkdirexists(gendir + str(len(os.listdir(gendir)) + 1))
-    new_gen = gendir + str(len(os.listdir(gendir)))
+    new_gen = gendir + str(int(os.path.basename(file_read(rookiedir + "/current_generation"))) + 1)
+    mkdirexists(new_gen)
     old_gen = file_read(rookiedir + "/current_generation")
     if os.path.isdir(old_gen):
         package_list = os.listdir(old_gen)
@@ -105,6 +105,10 @@ def make_new_generation():
 
 
 def switch_to_generation(new_gen):
+    package_list = os.listdir(new_gen)
+    for i in package_list:
+        package_store_dir = rookiedir + "/store/" + i
+        file_overwrite(file_read(package_store_dir + "/latest_hash") + "/reference", new_gen)
     file_overwrite(rookiedir + "/current_generation", new_gen)
     if os.path.isdir(rookiedir + "/bin"):
         os.remove(rookiedir + "/bin")
@@ -118,13 +122,12 @@ def install_package(package):
             package_name = package[0]
             package_store_dir = rookiedir + "/store/" + package_name
             gendir = rookiedir + "/generations/"
+            new_gen = gendir + str(int(os.path.basename(file_read(rookiedir + "/current_generation"))) + 1)
             make_new_generation()
-            new_gen = gendir + str(len(os.listdir(gendir)))
             if os.path.isfile(new_gen + "/" + package_name):
                 os.remove(new_gen + "/" + package_name)
             os.symlink(package_store_dir + "/latest", new_gen + "/" + package_name)
             switch_to_generation(new_gen)
-            file_overwrite(file_read(package_store_dir + "/latest_hash") + "/reference", new_gen)
         else:
             update_package(package)
     else:
@@ -232,9 +235,9 @@ def remove(package):
     package_name = package[0]
     package_list = os.listdir(rookiedir + "/bin")
     gendir = rookiedir + "/generations/"
+    new_gen = gendir + str(int(os.path.basename(file_read(rookiedir + "/current_generation"))) + 1)
     if package_name in package_list:
         make_new_generation()
-        new_gen = gendir + str(len(os.listdir(gendir)))
         os.remove(new_gen + "/" + package_name)
     switch_to_generation(new_gen)
 
@@ -243,6 +246,28 @@ def upgrade():
     package_list = os.listdir(rookiedir + "/bin")
     for i in package_list:
         update_package([i])
+
+
+def find_hashes_to_gc():
+    for i in os.listdir(rookiedir + "/store"):
+        package_store_dir = rookiedir + "/store/" + i
+        for j in os.listdir(package_store_dir):
+            if os.path.isdir(package_store_dir + "/" + j):
+                reference = file_read(package_store_dir + "/" + j + "/reference")
+                if not os.path.isdir(reference):
+                    shutil.rmtree(package_store_dir + "/" + j)
+    for i in os.listdir(rookiedir + "/store"):
+        package_store_dir = rookiedir + "/store/" + i
+        if not os.path.isdir(file_read(package_store_dir + "/latest_hash")):
+            shutil.rmtree(package_store_dir)
+
+
+def garbage_collect():
+    for i in os.listdir(rookiedir + "/generations"):
+        path = rookiedir + "/generations/" + i
+        if path != file_read(rookiedir + "/current_generation"):
+            shutil.rmtree(path)
+    find_hashes_to_gc()
 
 
 def main():
@@ -262,6 +287,7 @@ def main():
     parser.add_argument('--list-definitions', action='store_true', help='List package definitions')
     parser.add_argument('--list-generations', action='store_true', help='List generations')
     parser.add_argument('--switch', metavar='<generation>', nargs=1, type=int, default=0, help='Switch to <generation>')
+    parser.add_argument('--garbage-collect', action='store_true', help='Delete old generations and files')
 
     args = parser.parse_args()
 
@@ -297,6 +323,11 @@ def main():
 
     elif args.upgrade:
         upgrade()
+
+    elif args.garbage_collect:
+        garbage_collect()
+    else:
+        print("try --help")
 
 
 if __name__ == "__main__":
