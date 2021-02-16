@@ -169,10 +169,17 @@ def list_packages():
 
 def list_definitions():
     def_list = os.listdir(rookiedir + "/definitions")
-    print("There are " + str(len(def_list)) + " package(s) defined")
+    print("There are " + str(len(def_list)) + " package(s) defined:")
     print()
     for i in def_list:
         print(i)
+
+
+def list_generations():
+    gen_list = os.listdir(rookiedir + "/generations")
+    print("There are " + str(len(gen_list)) + " generation(s):")
+    print()
+    print(gen_list)
 
 
 def main():
@@ -215,6 +222,9 @@ def main():
 
     elif args.list_definitions:
         list_definitions()
+
+    elif args.list_generations:
+        list_generations()
 
 
 if __name__ == "__main__":
