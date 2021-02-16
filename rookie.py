@@ -94,10 +94,14 @@ def create(q):
 
 def make_new_generation():
     gendir = rookiedir + "/generations/"
-    if os.path.isdir(file_read(rookiedir + "/current_generation")):
-        copy_tree(file_read(rookiedir + "/current_generation"), gendir + str(len(os.listdir(gendir)) + 1))
-    else:
-        mkdirexists(gendir + str(len(os.listdir(gendir)) + 1))
+
+    mkdirexists(gendir + str(len(os.listdir(gendir)) + 1))
+    new_gen = gendir + str(len(os.listdir(gendir)))
+    old_gen = file_read(rookiedir + "/current_generation")
+    if os.path.isdir(old_gen):
+        package_list = os.listdir(old_gen)
+        for i in package_list:
+            os.symlink(rookiedir + "/store/" + i + "/latest", new_gen + "/" + i)
 
 
 def switch_to_generation(new_gen):
