@@ -250,7 +250,7 @@ def main():
         epilog="""Copyright (C) TODO placeholder put something here""")
 
     parser.add_argument('--init', action='store_true', help='Setup RookiePM')
-    parser.add_argument('--create', metavar=('<package>', '<type>', '<url>'), nargs=3, type=str, default="", help='Define <package> of <type> [script, tarball, appimage], with <url>')
+    parser.add_argument('--create', metavar=('<package>', '<type>', '<url>'), nargs=3, type=str, default="", help='Define <package> of <type>, with <url>')
     parser.add_argument('--install', metavar='<package>', nargs=1, type=str, default="", help='Install <package>')
     parser.add_argument('--update', metavar='<package>', nargs=1, type=str, default="", help='Update <package>')
     parser.add_argument('--upgrade', action='store_true', help='update all packages')
