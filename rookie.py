@@ -226,6 +226,9 @@ def main():
     elif args.list_generations:
         list_generations()
 
+    elif args.switch != 0:
+        switch_to_generation(rookiedir + "/generations/" + str(args.switch[0]))
+
 
 if __name__ == "__main__":
     try:
