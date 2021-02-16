@@ -6,6 +6,7 @@ import re
 import requests
 import hashlib
 import shutil
+import sys
 from distutils.dir_util import copy_tree
 
 home = os.path.expanduser('~')
@@ -213,9 +214,15 @@ def list_definitions():
 
 def list_generations():
     gen_list = os.listdir(rookiedir + "/generations")
+    gen_list.sort(key=int)
     print("There are " + str(len(gen_list)) + " generation(s):")
     print()
-    print(gen_list)
+    for i in gen_list:
+        packages_in_gen = os.listdir(rookiedir + "/generations/" + i)
+        sys.stdout.write(i + ": ")
+        for j in packages_in_gen:
+            sys.stdout.write(j + " ")
+        print()
 
 
 def remove(package):
