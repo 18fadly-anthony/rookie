@@ -193,6 +193,12 @@ def remove(package):
     switch_to_generation(new_gen)
 
 
+def upgrade():
+    package_list = os.listdir(rookiedir + "/bin")
+    for i in package_list:
+        update_package([i])
+
+
 def main():
 
     # Define Arguments
@@ -242,6 +248,9 @@ def main():
 
     elif args.remove != '':
         remove(args.remove)
+
+    elif args.upgrade:
+        upgrade()
 
 
 if __name__ == "__main__":
