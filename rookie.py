@@ -126,7 +126,7 @@ def install_package(package):
             make_new_generation()
             if os.path.isfile(new_gen + "/" + package_name):
                 os.remove(new_gen + "/" + package_name)
-            os.symlink(package_store_dir + "/latest", new_gen + "/" + package_name)
+            os.symlink(os.readlink(package_store_dir + "/latest"), new_gen + "/" + package_name)
             switch_to_generation(new_gen)
         else:
             update_package(package)
