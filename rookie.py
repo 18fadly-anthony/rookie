@@ -78,16 +78,27 @@ def init():
 
 
 def create(q):
-    valid_package_types = ["script", "appimage"]
+    valid_package_types = ["script", "appimage", "local"]
+    need_url_types = ["script", "appimage"]
+    need_local_types = ["local"]
     if os.path.isdir(home + "/.rookie/definitions"):
         if q[1] in valid_package_types:
-            if validate_url(q[2]):
-                mkdirexists(home + "/.rookie/definitions/" + q[0])
-                file_overwrite(home + "/.rookie/definitions/" + q[0] + "/name", q[0])
-                file_overwrite(home + "/.rookie/definitions/" + q[0] + "/type", q[1])
-                file_overwrite(home + "/.rookie/definitions/" + q[0] + "/url", q[2])
-            else:
-                print("Error: url is not valid")
+            if q[1] in need_url_types:
+                if validate_url(q[2]):
+                    mkdirexists(home + "/.rookie/definitions/" + q[0])
+                    file_overwrite(home + "/.rookie/definitions/" + q[0] + "/name", q[0])
+                    file_overwrite(home + "/.rookie/definitions/" + q[0] + "/type", q[1])
+                    file_overwrite(home + "/.rookie/definitions/" + q[0] + "/url", q[2])
+                else:
+                    print("Error: url is not valid")
+            elif q[1] in need_local_types:
+                if os.path.isfile(q[2]):
+                    mkdirexists(home + "/.rookie/definitions/" + q[0])
+                    file_overwrite(home + "/.rookie/definitions/" + q[0] + "/name", q[0])
+                    file_overwrite(home + "/.rookie/definitions/" + q[0] + "/type", q[1])
+                    file_overwrite(home + "/.rookie/definitions/" + q[0] + "/url", q[2])
+                else:
+                    print("Error: file does not exist")
         else:
             print("Error, that is not a valid package type, the valid package types are: " + str(valid_package_types))
     else:
@@ -142,10 +153,13 @@ def install_package(package):
 
 def update_package(package):
     package_name = package[0]
-    if file_read(rookiedir + "/definitions/" + package_name + "/type") == "script":
+    defdir = rookiedir + "/definitions/"
+    if file_read(defdir + package_name + "/type") == "script":
         update_script(package)
-    if file_read(rookiedir + "/definitions/" + package_name + "/type") == "appimage":
+    elif file_read(defdir + package_name + "/type") == "appimage":
         update_appimage(package)
+    elif file_read(defdir + package_name + "/type") == "local":
+        update_local(package)
 
 
 def create_appimage_wrapper(wrapper_path, appimage_path):
@@ -202,6 +216,27 @@ def update_script(package):
     file_overwrite(package_store_dir + "/latest_hash", package_store_dir + "/" + package_hash)
     os.symlink(package_store_dir + "/" + package_hash + "/bin/" + package_name, package_store_dir + "/latest")
 
+    install_package(package) # Call install again after the package has been updated
+
+
+def update_local(package):
+    package_name = package[0]
+    defdir = rookiedir + "/definitions/"
+    shutil.copyfile(file_read(rookiedir + "/definitions/" + package_name + "/url"), rookiedir + "/tmp/" + package_name)
+    package_store_dir = rookiedir + "/store/" + package_name
+    mkdirexists(package_store_dir)
+    package_hash = hash_file(rookiedir + "/tmp/" + package_name)
+    mkdirexists(package_store_dir + "/" + package_hash)
+    mkdirexists(package_store_dir + "/" + package_hash + "/bin")
+    if not os.path.isfile(package_store_dir + "/" + package_hash + "/bin/" + package_name):
+        shutil.move(rookiedir + "/tmp/" + package_name, package_store_dir + "/" + package_hash + "/bin/" + package_name)
+        os.chmod(package_store_dir + "/" + package_hash + "/bin/" + package_name, 0o777)
+    else:
+        os.remove(rookiedir + "/tmp/" + package_name)
+    if os.path.isfile(package_store_dir + "/latest"):
+        os.remove(package_store_dir + "/latest")
+    file_overwrite(package_store_dir + "/latest_hash", package_store_dir + "/" + package_hash)
+    os.symlink(package_store_dir + "/" + package_hash + "/bin/" + package_name, package_store_dir + "/latest")
     install_package(package) # Call install again after the package has been updated
 
 
