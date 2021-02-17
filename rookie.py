@@ -204,7 +204,7 @@ def list_packages():
     print("There are " + str(len(package_list)) + " package(s) installed:")
     print()
     for i in package_list:
-        print(i)
+        print(i + " (" + file_read(rookiedir + "/definitions/" + i + "/type") + ")")
 
 
 def list_definitions():
@@ -212,7 +212,7 @@ def list_definitions():
     print("There are " + str(len(def_list)) + " package(s) defined:")
     print()
     for i in def_list:
-        print(i)
+        print(i + " (" + file_read(rookiedir + "/definitions/" + i + "/type") + ")")
 
 
 def list_generations():
