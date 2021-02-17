@@ -47,6 +47,7 @@ def file_read(filename):
     f = open(filename, "r")
     return f.read()
 
+
 def download_file(url, dest_path):
     r = requests.get(url)
 
@@ -102,7 +103,7 @@ def make_new_generation():
     if os.path.isdir(old_gen):
         package_list = os.listdir(old_gen)
         for i in package_list:
-            os.symlink(rookiedir + "/store/" + i + "/latest", new_gen + "/" + i)
+            os.symlink(os.readlink(rookiedir + "/store/" + i + "/latest"), new_gen + "/" + i)
 
 
 def switch_to_generation(new_gen):
