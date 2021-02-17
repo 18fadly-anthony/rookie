@@ -72,7 +72,8 @@ def init():
     mkdirexists(home + "/.rookie/generations")
     mkdirexists(home + "/.rookie/store")
     mkdirexists(home + "/.rookie/tmp")
-    file_overwrite(home + "/.rookie/current_generation", "0")
+    file_overwrite(home + "/.rookie/current_generation", home + "/.rookie/generations/0")
+    file_overwrite(home + "/.rookie/latest_generation", "0")
 
 
 def create(q):
@@ -95,7 +96,7 @@ def create(q):
 def make_new_generation():
     gendir = rookiedir + "/generations/"
 
-    new_gen = gendir + str(int(os.path.basename(file_read(rookiedir + "/current_generation"))) + 1)
+    new_gen = gendir + str(int(file_read(rookiedir + "/latest_generation")) + 1)
     mkdirexists(new_gen)
     old_gen = file_read(rookiedir + "/current_generation")
     if os.path.isdir(old_gen):
@@ -110,6 +111,10 @@ def switch_to_generation(new_gen):
         package_store_dir = rookiedir + "/store/" + i
         file_overwrite(file_read(package_store_dir + "/latest_hash") + "/reference", new_gen)
     file_overwrite(rookiedir + "/current_generation", new_gen)
+    gen_number = int(os.path.basename(file_read(rookiedir + "/current_generation")))
+    old_gen_number = int(file_read(rookiedir + "/latest_generation"))
+    if gen_number > old_gen_number:
+       file_overwrite(rookiedir + "/latest_generation", str(gen_number))
     if os.path.isdir(rookiedir + "/bin"):
         os.remove(rookiedir + "/bin")
     os.symlink(new_gen, rookiedir + "/bin")
@@ -122,7 +127,7 @@ def install_package(package):
             package_name = package[0]
             package_store_dir = rookiedir + "/store/" + package_name
             gendir = rookiedir + "/generations/"
-            new_gen = gendir + str(int(os.path.basename(file_read(rookiedir + "/current_generation"))) + 1)
+            new_gen = gendir + str(int(file_read(rookiedir + "/latest_generation")) + 1)
             make_new_generation()
             if os.path.isfile(new_gen + "/" + package_name):
                 os.remove(new_gen + "/" + package_name)
