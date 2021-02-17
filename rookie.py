@@ -276,6 +276,17 @@ def garbage_collect():
     find_hashes_to_gc()
 
 
+def delete_definition(package):
+    defdir = rookiedir + "/definitions/"
+    storedir = rookiedir + "/store/"
+    if os.path.isdir(defdir + package):
+        if os.path.isdir(storedir + package):
+            print("Error: package needs to be removed from store before its definition is deleted")
+            print("try --remove followed by --garbage-collect")
+        else:
+            shutil.rmtree(defdir + package)
+
+
 def main():
 
     # Define Arguments
@@ -294,6 +305,7 @@ def main():
     parser.add_argument('--list-generations', action='store_true', help='List generations')
     parser.add_argument('--switch', metavar='<generation>', nargs=1, type=int, default=0, help='Switch to <generation>')
     parser.add_argument('--garbage-collect', action='store_true', help='Delete old generations and files')
+    parser.add_argument('--delete-definition', metavar='<package>', nargs=1, type=str, default="", help='Remove <package> definition')
 
     args = parser.parse_args()
 
@@ -332,6 +344,10 @@ def main():
 
     elif args.garbage_collect:
         garbage_collect()
+
+    elif args.delete_definition != '':
+        delete_definition(args.delete_definition[0])
+
     else:
         print("try --help")
 
