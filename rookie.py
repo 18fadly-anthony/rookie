@@ -181,6 +181,8 @@ def update_package(package):
         update_appimage(package)
     elif file_read(defdir + package_name + "/type") == "local":
         update_local(package)
+    else:
+        print("Error: unknown package type")
 
 
 def create_appimage_wrapper(wrapper_path, appimage_path):
