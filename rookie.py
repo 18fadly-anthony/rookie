@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
 
+# Copyright (c) 2021 Anthony Fadly (18fadly.anthony@gmail.com)
+# This program is licensed under GNU LGPL
+# You are free to copy, modify, and redistribute the code.
+# See COPYING file.
+
 import os
 import argparse
 import re
@@ -327,7 +332,7 @@ def main():
     # Define Arguments
     parser = argparse.ArgumentParser(
         description='''RookiePM: Yet Another Nix/Guix Inspired Package Manager''',
-        epilog="""Copyright (C) TODO placeholder put something here""")
+        epilog="""Copyright (C) 2021 Anthony Fadly""")
 
     parser.add_argument('--init', action='store_true', help='Setup RookiePM')
     parser.add_argument('--create', metavar=('<package>', '<type>', '<url>'), nargs=3, type=str, default="", help='Define <package> of <type>, with <url>')
