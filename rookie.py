@@ -343,6 +343,22 @@ def delete_definition(package):
             shutil.rmtree(defdir + package)
 
 
+def update_repos():
+    repodir = rookiedir + "/repos"
+    defdir = rookiedir + "/definitions/"
+    for i in os.listdir(repodir):
+        repo = file_read(repodir + "/" + i)
+        tmprepo = rookiedir + "/tmp/" + i
+        download_file(repo + "/pkgs", tmprepo)
+        repo_pkgs = read_file_to_array(tmprepo)
+        for j in repo_pkgs:
+            mkdirexists(defdir + j)
+            download_file(repo + "/" + j + "/name", defdir + j + "/name")
+            download_file(repo + "/" + j + "/type", defdir + j + "/type")
+            download_file(repo + "/" + j + "/url", defdir + j + "/url")
+            download_file(repo + "/" + j + "/version", defdir + j + "/version")
+
+
 def main():
 
     # Define Arguments
@@ -363,6 +379,7 @@ def main():
     parser.add_argument('--garbage-collect', action='store_true', help='Delete old generations and files')
     parser.add_argument('--delete-definition', metavar='<package>', nargs=1, type=str, default="", help='Remove <package> definition')
     parser.add_argument('--add-repo', metavar=('<name>', '<url>'), nargs=2, type=str, default='', help='Add repository')
+    parser.add_argument('--update-repos', action='store_true', help='Update repositories')
 
     args = parser.parse_args()
 
@@ -407,6 +424,9 @@ def main():
 
     elif args.add_repo != '':
         add_repo(args.add_repo)
+
+    elif args.update_repos:
+        update_repos()
 
     else:
         print("try --help")
