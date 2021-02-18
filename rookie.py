@@ -71,6 +71,14 @@ def hash_file(filename):
     return hasher.hexdigest()
 
 
+def read_file_to_array(filename):
+    content_array = []
+    with open(filename) as f:
+        for line in f:
+            content_array.append(line.rstrip('\n'))
+        return(content_array)
+
+
 # Define Package Manager Functions
 def init():
     mkdirexists(home + "/.rookie")
@@ -78,6 +86,7 @@ def init():
     mkdirexists(home + "/.rookie/generations")
     mkdirexists(home + "/.rookie/store")
     mkdirexists(home + "/.rookie/tmp")
+    mkdirexists(home + "/.rookie/repos")
     file_overwrite(home + "/.rookie/current_generation", home + "/.rookie/generations/0")
     file_overwrite(home + "/.rookie/latest_generation", "0")
 
@@ -108,6 +117,13 @@ def create(q):
             print("Error, that is not a valid package type, the valid package types are: " + str(valid_package_types))
     else:
         print("Error: please run --init first")
+
+
+def add_repo(args):
+    if validate_url(args[1]):
+        file_overwrite(rookiedir + "/repos/" + args[0], args[1])
+    else:
+        print("Error: url is not valid")
 
 
 def make_new_generation():
@@ -346,6 +362,7 @@ def main():
     parser.add_argument('--switch', metavar='<generation>', nargs=1, type=int, default=0, help='Switch to <generation>')
     parser.add_argument('--garbage-collect', action='store_true', help='Delete old generations and files')
     parser.add_argument('--delete-definition', metavar='<package>', nargs=1, type=str, default="", help='Remove <package> definition')
+    parser.add_argument('--add-repo', metavar=('<name>', '<url>'), nargs=2, type=str, default='', help='Add repository')
 
     args = parser.parse_args()
 
@@ -387,6 +404,9 @@ def main():
 
     elif args.delete_definition != '':
         delete_definition(args.delete_definition[0])
+
+    elif args.add_repo != '':
+        add_repo(args.add_repo)
 
     else:
         print("try --help")
