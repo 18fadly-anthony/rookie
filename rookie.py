@@ -357,6 +357,7 @@ def update_repos():
             download_file(repo + "/" + j + "/type", defdir + j + "/type")
             download_file(repo + "/" + j + "/url", defdir + j + "/url")
             download_file(repo + "/" + j + "/version", defdir + j + "/version")
+        os.remove(tmprepo)
 
 
 def main():
