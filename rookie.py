@@ -278,6 +278,8 @@ def update_versioned_script(package):
     file_overwrite(package_store_dir + "/latest_hash", package_store_dir + "/" + package_hash)
     os.symlink(package_store_dir + "/" + package_hash + "/bin/" + package_name, package_store_dir + "/latest")
 
+    install_package(package) # Call install again after the package has been updated
+
 
 def update_local(package):
     package_name = package[0]
