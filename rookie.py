@@ -56,8 +56,7 @@ def file_read(filename):
 def download_file(url, dest_path):
     r = requests.get(url)
 
-    with open(dest_path, 'wb') as f:
-        f.write(r.content)
+    file_overwrite(dest_path, r.content.decode("utf-8").strip('\n'))
 
 
 def hash_file(filename):
@@ -175,12 +174,15 @@ def install_package(package):
 def update_package(package):
     package_name = package[0]
     defdir = rookiedir + "/definitions/"
-    if file_read(defdir + package_name + "/type") == "script":
+    package_type = file_read(defdir + package_name + "/type")
+    if package_type == "script":
         update_script(package)
-    elif file_read(defdir + package_name + "/type") == "appimage":
+    elif package_type == "appimage":
         update_appimage(package)
-    elif file_read(defdir + package_name + "/type") == "local":
+    elif package_type == "local":
         update_local(package)
+    elif package_type == "versioned_script":
+        update_versioned_script(package)
     else:
         print("Error: unknown package type")
 
@@ -193,6 +195,7 @@ def create_appimage_wrapper(wrapper_path, appimage_path):
 
 def update_appimage(package):
     package_name = package[0]
+    print("Downloading package: " + package_name + "...")
     download_file(file_read(rookiedir + "/definitions/" + package_name + "/url"), rookiedir + "/tmp/" + package_name)
     package_store_dir = rookiedir + "/store/" + package_name
     mkdirexists(package_store_dir)
@@ -220,6 +223,7 @@ def update_appimage(package):
 
 def update_script(package):
     package_name = package[0]
+    print("Downloading package: " + package_name + "...")
     download_file(file_read(rookiedir + "/definitions/" + package_name + "/url"), rookiedir + "/tmp/" + package_name)
 
     package_store_dir = rookiedir + "/store/" + package_name
@@ -240,6 +244,39 @@ def update_script(package):
     os.symlink(package_store_dir + "/" + package_hash + "/bin/" + package_name, package_store_dir + "/latest")
 
     install_package(package) # Call install again after the package has been updated
+
+
+def update_versioned_script(package):
+    package_name = package[0]
+    package_store_dir = rookiedir + "/store/" + package_name
+    repo_version = int(file_read(rookiedir + "/definitions/" + package_name + "/version"))
+    if os.path.isdir(package_store_dir):
+        if os.path.isfile(package_store_dir + "/latest_hash"):
+            package_hash = file_read(package_store_dir + "/latest_hash")
+            if os.path.isdir(package_hash):
+                if os.path.isfile(package_hash + "/version"):
+                    cur_version = int(file_read(package_hash + "/version"))
+                    if not repo_version > cur_version:
+                        print("Already up to date")
+                        return
+
+    print("Downloading package: " + package_name + "...")
+    download_file(file_read(rookiedir + "/definitions/" + package_name + "/url"), rookiedir + "/tmp/" + package_name)
+    package_hash = hash_file(rookiedir + "/tmp/" + package_name)
+    mkdirexists(package_store_dir)
+    mkdirexists(package_store_dir + "/" + package_hash)
+    mkdirexists(package_store_dir + "/" + package_hash + "/bin")
+    if not os.path.isfile(package_store_dir + "/" + package_hash + "/bin/" + package_name):
+        shutil.move(rookiedir + "/tmp/" + package_name, package_store_dir + "/" + package_hash + "/bin/" + package_name)
+        os.chmod(package_store_dir + "/" + package_hash + "/bin/" + package_name, 0o777)
+    else:
+        os.remove(rookiedir + "/tmp/" + package_name)
+        # But versioning should prevent this wasteful scenario from ever happening so if it does than something went wrong...
+    if os.path.isfile(package_store_dir + "/latest"):
+        os.remove(package_store_dir + "/latest")
+    file_overwrite(package_store_dir + "/" + package_hash + "/version", str(repo_version))
+    file_overwrite(package_store_dir + "/latest_hash", package_store_dir + "/" + package_hash)
+    os.symlink(package_store_dir + "/" + package_hash + "/bin/" + package_name, package_store_dir + "/latest")
 
 
 def update_local(package):
