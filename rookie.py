@@ -16,6 +16,7 @@ from distutils.dir_util import copy_tree
 
 home = os.path.expanduser('~')
 rookiedir = home + "/.rookie"
+defdir = rookiedir + "/definitions/"
 
 
 # Define General Functions
@@ -180,7 +181,6 @@ def install_package(package):
 
 def update_package(package):
     package_name = package[0]
-    defdir = rookiedir + "/definitions/"
     package_type = file_read(defdir + package_name + "/type")
     if package_type == "script":
         update_script(package)
@@ -192,6 +192,8 @@ def update_package(package):
         update_versioned_script(package)
     elif package_type == "versioned_appimage":
         update_versioned_appimage(package)
+    elif package_type == "meta":
+        update_meta(package)
     else:
         print("Error: unknown package type")
 
@@ -325,9 +327,22 @@ def update_versioned_appimage(package):
     install_package(package) # Call install again after the package has been updated
 
 
+def update_meta(package):
+    package_name = package[0]
+    package_store_dir = rookiedir + "/store/" + package_name
+    if os.path.isdir(package_store_dir):
+        return
+    dependencies = read_file_to_array(rookiedir + "/definitions/" + package_name + "/depends")
+    for i in dependencies:
+        if not os.path.isdir(defdir + i):
+            print("Error: " + package_name + " depends " + i + " but it is not defined")
+            return
+    for i in dependencies:
+        install_package([i])
+
+
 def update_local(package):
     package_name = package[0]
-    defdir = rookiedir + "/definitions/"
     shutil.copyfile(file_read(rookiedir + "/definitions/" + package_name + "/url"), rookiedir + "/tmp/" + package_name)
     package_store_dir = rookiedir + "/store/" + package_name
     mkdirexists(package_store_dir)
@@ -418,7 +433,6 @@ def garbage_collect():
 
 
 def delete_definition(package):
-    defdir = rookiedir + "/definitions/"
     storedir = rookiedir + "/store/"
     if os.path.isdir(defdir + package):
         if os.path.isdir(storedir + package):
@@ -430,7 +444,6 @@ def delete_definition(package):
 
 def update_repos():
     repodir = rookiedir + "/repos"
-    defdir = rookiedir + "/definitions/"
     for i in os.listdir(repodir):
         repo = file_read(repodir + "/" + i)
         print("Downloading package list from " + repo + "...")
@@ -441,8 +454,12 @@ def update_repos():
             mkdirexists(defdir + j)
             download_file(repo + "/" + j + "/name", defdir + j + "/name")
             download_file(repo + "/" + j + "/type", defdir + j + "/type")
-            download_file(repo + "/" + j + "/url", defdir + j + "/url")
-            download_file(repo + "/" + j + "/version", defdir + j + "/version")
+            type = file_read(defdir + j + "/type")
+            if type == "meta":
+                download_file(repo + "/" + j + "/depends", defdir + j + "/depends")
+            else:
+                download_file(repo + "/" + j + "/url", defdir + j + "/url")
+                download_file(repo + "/" + j + "/version", defdir + j + "/version")
         os.remove(tmprepo)
 
 
