@@ -389,6 +389,7 @@ def update_repos():
     defdir = rookiedir + "/definitions/"
     for i in os.listdir(repodir):
         repo = file_read(repodir + "/" + i)
+        print("Downloading package list from " + repo + "...")
         tmprepo = rookiedir + "/tmp/" + i
         download_file(repo + "/pkgs", tmprepo)
         repo_pkgs = read_file_to_array(tmprepo)
