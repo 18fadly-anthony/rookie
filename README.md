@@ -20,7 +20,7 @@ $ ./rookie.py --install rookie.py
 
 Then add ~/.rookie/bin to PATH
 
-# Usage
+## Usage
 
 ```
 $ rookie.py --add-repo example https://18fadly-anthony.github.io/rookie-repo-example/
