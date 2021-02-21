@@ -37,3 +37,5 @@ $ rookie.py --list-generations # look at the generations
 
 $ rookie.py --switch <generation> # switch generations
 ```
+
+Appimage support requires appimage-run
