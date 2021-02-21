@@ -2,20 +2,23 @@
 
 ## Installation
 
+Install python3 and requests, in many GNU/Linux distros requests is in the standard library but on NixOS it is not
+
 ```
-# Install python3
-
-$ pip install requests # or install with nix
-
 $ git clone --depth 1 https://github.com/18fadly-anthony/rookie
+```
 
-# put rookie.py in PATH
-
-$ rookie.py --init
-
-# add ~/.rookie/bin to PATH
+Put add rookie.py to your PATH, alternatively you can install rookie with itself like this:
 
 ```
+$ ./rookie.py --init
+
+$ ./rookie.py --create rookie.py local $(pwd)/rookie.py
+
+$ ./rookie.py --install rookie.py
+```
+
+Then add ~/.rookie/bin to PATH
 
 # Usage
 
