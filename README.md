@@ -2,7 +2,7 @@
 
 ## Installation
 
-Install python3 and requests, in many GNU/Linux distros requests is in the standard library but on NixOS it is not
+Install python3 and requests, in many GNU/Linux distros, requests is in the python standard library but on NixOS it is not
 
 ```
 $ git clone --depth 1 https://github.com/18fadly-anthony/rookie
