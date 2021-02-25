@@ -5,8 +5,10 @@ stdenv.mkDerivation {
   buildInputs = [
     # System requirements.
     readline
+    appimage-run
 
     # Python requirements
+    python3
     python3Packages.requests
   ];
   src = null;
