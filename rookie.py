@@ -12,7 +12,6 @@ import requests
 import hashlib
 import shutil
 import sys
-from distutils.dir_util import copy_tree
 
 home = os.path.expanduser('~')
 rookiedir = home + "/.rookie"
