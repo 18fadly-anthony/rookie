@@ -86,6 +86,15 @@ def read_file_to_array(filename):
         return(content_array)
 
 
+def addlist(current,target):
+    add = []
+    intersection  = set(current) & set(target)
+    for i in target:
+        if i not in intersection:
+            add.append(i)
+    return add
+
+
 # Define Package Manager Functions
 def init():
     mkdirexists(home + "/.rookie")
@@ -363,16 +372,12 @@ def update_local(package):
 
 def list_packages():
     package_list = os.listdir(rookiedir + "/bin")
-    print("There are " + str(len(package_list)) + " package(s) installed:")
-    print()
     for i in package_list:
         print(i + " (" + file_read(rookiedir + "/definitions/" + i + "/type") + ")")
 
 
 def list_definitions():
     def_list = os.listdir(rookiedir + "/definitions")
-    print("There are " + str(len(def_list)) + " package(s) defined:")
-    print()
     for i in def_list:
         print(i + " (" + file_read(rookiedir + "/definitions/" + i + "/type") + ")")
 
@@ -381,13 +386,26 @@ def list_generations():
     gen_list = os.listdir(rookiedir + "/generations")
     gen_list.sort(key=int)
     current_gen = file_read(rookiedir + "/current_generation")
-    print("There are " + str(len(gen_list)) + " generation(s):")
+    if len(gen_list) > 1:
+        print("There are " + str(len(gen_list)) + " generations:")
+    else:
+        print("There is one generation")
     print()
     for i in gen_list:
         packages_in_gen = os.listdir(rookiedir + "/generations/" + i)
         sys.stdout.write(i + ": ")
-        for j in packages_in_gen:
-            sys.stdout.write(j + " ")
+        if i > gen_list[0]:
+            packages_in_last_gen = os.listdir(rookiedir + "/generations/" + str(int(i) - 1))
+            added_packages = addlist(packages_in_last_gen, packages_in_gen)
+            removed_packages = addlist(packages_in_gen, packages_in_last_gen)
+            if added_packages != []:
+                for j in added_packages:
+                    sys.stdout.write("+" + j)
+            if removed_packages != []:
+                for j in removed_packages:
+                    sys.stdout.write("-" + j)
+        else:
+            sys.stdout.write("(oldest)")
         if rookiedir + "/generations/" + i == current_gen:
             sys.stdout.write("(current)")
         print()
