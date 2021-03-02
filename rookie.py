@@ -276,7 +276,6 @@ def update_versioned_script(package):
                 if os.path.isfile(package_hash + "/version"):
                     cur_version = int(file_read(package_hash + "/version"))
                     if not repo_version > cur_version:
-                        print(package_name + " is already up to date")
                         return
 
     print("Downloading package: " + package_name + "...")
@@ -311,7 +310,6 @@ def update_versioned_appimage(package):
                 if os.path.isfile(package_hash + "/version"):
                     cur_version = int(file_read(package_hash + "/version"))
                     if not repo_version > cur_version:
-                        print(package_name + " is already up to date")
                         return
     print("Downloading package: " + package_name + "...")
     download_binary(file_read(rookiedir + "/definitions/" + package_name + "/url"), rookiedir + "/tmp/" + package_name)
