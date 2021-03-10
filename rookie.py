@@ -81,7 +81,7 @@ def read_file_to_array(filename):
     content_array = []
     with open(filename) as f:
         for line in f:
-            content_array.append(line.rstrip('\n'))
+            content_array.append(line.strip('\n'))
         return(content_array)
 
 
@@ -147,10 +147,11 @@ def make_new_generation():
     new_gen = gendir + str(int(file_read(rookiedir + "/latest_generation")) + 1)
     mkdirexists(new_gen)
     old_gen = file_read(rookiedir + "/current_generation")
+
     if os.path.isdir(old_gen):
         package_list = os.listdir(old_gen)
         for i in package_list:
-            os.symlink(os.readlink(rookiedir + "/store/" + i + "/latest"), new_gen + "/" + i)
+            os.symlink(os.readlink(old_gen + "/" + i), new_gen + "/" + i)
 
 
 def switch_to_generation(new_gen):
@@ -158,10 +159,13 @@ def switch_to_generation(new_gen):
     for i in package_list:
         package_store_dir = rookiedir + "/store/" + i
         file_overwrite(file_read(package_store_dir + "/latest_hash") + "/reference", new_gen)
+
+    old_gen_number = int(os.path.basename(file_read(rookiedir + "/current_generation")))
     file_overwrite(rookiedir + "/current_generation", new_gen)
-    gen_number = int(os.path.basename(file_read(rookiedir + "/current_generation")))
-    old_gen_number = int(file_read(rookiedir + "/latest_generation"))
-    if gen_number > old_gen_number:
+    gen_number = int(os.path.basename(new_gen))
+    latest_gen_number = int(file_read(rookiedir + "/latest_generation"))
+
+    if gen_number > latest_gen_number:
        file_overwrite(rookiedir + "/latest_generation", str(gen_number))
     if os.path.isdir(rookiedir + "/bin"):
         os.remove(rookiedir + "/bin")
