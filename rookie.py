@@ -178,12 +178,20 @@ def install_package(package):
         if os.path.isdir(home + "/.rookie/store/" + package[0]):
             package_name = package[0]
             package_store_dir = rookiedir + "/store/" + package_name
+            package_type = file_read(defdir + package_name + "/type")
             gendir = rookiedir + "/generations/"
             new_gen = gendir + str(int(file_read(rookiedir + "/latest_generation")) + 1)
             make_new_generation()
             if os.path.isfile(new_gen + "/" + package_name):
                 os.remove(new_gen + "/" + package_name)
-            os.symlink(os.readlink(package_store_dir + "/latest"), new_gen + "/" + package_name)
+            if package_type != "config":
+                os.symlink(os.readlink(package_store_dir + "/latest"), new_gen + "/" + package_name)
+            else:
+                destination = os.path.expanduser(file_read(defdir + package_name + "/destination"))
+                destdir = os.path.dirname(destination)
+                if not os.path.exists(destdir):
+                    os.makedirs(destdir)
+                os.symlink(os.readlink(package_store_dir + "/latest"), destination)
             switch_to_generation(new_gen)
         else:
             update_package(package)
@@ -206,6 +214,8 @@ def update_package(package):
         update_versioned_appimage(package)
     elif package_type == "meta":
         update_meta(package)
+    elif package_type == "config":
+        update_config(package)
     else:
         print("Error: unknown package type")
 
@@ -351,6 +361,36 @@ def update_meta(package):
         install_package([i])
 
 
+def update_config(package):
+    package_name = package[0]
+    package_store_dir = rookiedir + "/store/" + package_name
+    repo_version = int(file_read(rookiedir + "/definitions/" + package_name + "/version"))
+    if os.path.isdir(package_store_dir):
+        if os.path.isfile(package_store_dir + "/latest_hash"):
+            package_hash = file_read(package_store_dir + "/latest_hash")
+            if os.path.isdir(package_hash):
+                if os.path.isfile(package_hash + "/version"):
+                    cur_version = int(file_read(package_hash + "/version"))
+                    if not repo_version > cur_version:
+                        return
+    print("Downloading package: " + package_name + "...")
+    download_file(file_read(rookiedir + "/definitions/" + package_name + "/url"), rookiedir + "/tmp/" + package_name)
+    package_hash = hash_file(rookiedir + "/tmp/" + package_name)
+    mkdirexists(package_store_dir)
+    mkdirexists(package_store_dir + "/" + package_hash)
+    mkdirexists(package_store_dir + "/" + package_hash + "/config")
+    if not os.path.isfile(package_store_dir + "/" + package_hash + "/config/" + package_name):
+        shutil.move(rookiedir + "/tmp/" + package_name, package_store_dir + "/" + package_hash + "/config/" + package_name)
+    else:
+        os.remove(rookiedir + "/tmp/" + package_name)
+    if os.path.isfile(package_store_dir + "/latest"):
+        os.remove(package_store_dir + "/latest")
+    file_overwrite(package_store_dir + "/" + package_hash + "/version", str(repo_version))
+    file_overwrite(package_store_dir + "/latest_hash", package_store_dir + "/" + package_hash)
+    os.symlink(package_store_dir + "/" + package_hash + "/config/" + package_name, package_store_dir + "/latest")
+    install_package(package)
+
+
 def update_local(package):
     package_name = package[0]
     shutil.copyfile(file_read(rookiedir + "/definitions/" + package_name + "/url"), rookiedir + "/tmp/" + package_name)
@@ -479,6 +519,8 @@ def update_repos():
             else:
                 download_file(repo + "/" + j + "/url", defdir + j + "/url")
                 download_file(repo + "/" + j + "/version", defdir + j + "/version")
+            if type == "config":
+                download_file(repo + "/" + j + "/destination", defdir + j + "/destination")
         os.remove(tmprepo)
 
 
