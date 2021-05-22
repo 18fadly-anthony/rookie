@@ -434,21 +434,19 @@ def list_generations():
     print()
     for i in gen_list:
         packages_in_gen = os.listdir(rookiedir + "/generations/" + i)
-        sys.stdout.write(i + ": ")
+        sys.stdout.write(i)
         if i > gen_list[0]:
             packages_in_last_gen = os.listdir(rookiedir + "/generations/" + str(int(i) - 1))
             added_packages = addlist(packages_in_last_gen, packages_in_gen)
             removed_packages = addlist(packages_in_gen, packages_in_last_gen)
             if added_packages != []:
                 for j in added_packages:
-                    sys.stdout.write("+" + j)
+                    sys.stdout.write(" +" + j)
             if removed_packages != []:
                 for j in removed_packages:
-                    sys.stdout.write("-" + j)
-        else:
-            sys.stdout.write("(oldest)")
+                    sys.stdout.write(" -" + j)
         if rookiedir + "/generations/" + i == current_gen:
-            sys.stdout.write("(current)")
+            sys.stdout.write(" (current)")
         print()
 
 
