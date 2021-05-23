@@ -455,10 +455,17 @@ def remove(package):
     package_list = os.listdir(rookiedir + "/bin")
     gendir = rookiedir + "/generations/"
     new_gen = gendir + str(int(os.path.basename(file_read(rookiedir + "/current_generation"))) + 1)
-    if package_name in package_list:
-        make_new_generation()
-        os.remove(new_gen + "/" + package_name)
-    switch_to_generation(new_gen)
+    package_type = file_read(defdir + package_name + "/type")
+    if package_type != "config":
+        if package_name in package_list:
+            make_new_generation()
+            os.remove(new_gen + "/" + package_name)
+            switch_to_generation(new_gen)
+    else:
+        destination = os.path.expanduser(file_read(defdir + package_name + "/destination"))
+        if os.path.isfile(destination):
+            if os.path.islink(destination):
+                os.remove(destination)
 
 
 def upgrade():
