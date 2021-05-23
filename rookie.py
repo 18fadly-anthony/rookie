@@ -191,6 +191,8 @@ def install_package(package):
                 destdir = os.path.dirname(destination)
                 if not os.path.exists(destdir):
                     os.makedirs(destdir)
+                if os.path.isfile(destination):
+                    os.remove(destination)
                 os.symlink(os.readlink(package_store_dir + "/latest"), destination)
             switch_to_generation(new_gen)
         else:
