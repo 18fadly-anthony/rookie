@@ -19,11 +19,15 @@ defdir = rookiedir + "/definitions/"
 
 
 # Define General Functions
+
+# Define a function mkdirexists which makes a directory if it doesn't exist
 def mkdirexists(dir):
     if not(os.path.isdir(dir)):
         os.mkdir(dir)
 
 
+# validate_url uses regex to check if a string is a url
+# this is used for adding repositories
 def validate_url(url):
     regex = re.compile(
         r'^(?:http|ftp)s?://' # http:// or https://
@@ -59,6 +63,8 @@ def download_file(url, dest_path):
     file_overwrite(dest_path, r.content.decode("utf-8").strip('\n'))
 
 
+# When downloading files that are not text (e.g. appimages)
+# things like " r.content.decode("utf-8").strip('\n')" do not apply
 def download_binary(url, dest_path):
     r = requests.get(url)
 
@@ -66,7 +72,9 @@ def download_binary(url, dest_path):
         f.write(r.content)
 
 
+# calculate the hash of a file, this is used for adding files to store
 def hash_file(filename):
+    # compute it in blocks to not run out of ram
     BLOCKSIZE = 65536
     hasher = hashlib.sha1()
     with open(filename, 'rb') as afile:
@@ -77,6 +85,7 @@ def hash_file(filename):
     return hasher.hexdigest()
 
 
+# read the contents of a file as an array by treating each new line as a new entry
 def read_file_to_array(filename):
     content_array = []
     with open(filename) as f:
@@ -85,7 +94,9 @@ def read_file_to_array(filename):
         return(content_array)
 
 
-def addlist(current,target):
+# determine what has changed between two arrays
+# this is used when listing generations to show what packages changed
+def addlist(current, target):
     add = []
     intersection  = set(current) & set(target)
     for i in target:
@@ -95,6 +106,8 @@ def addlist(current,target):
 
 
 # Define Package Manager Functions
+
+# init function makes folders and initial files
 def init():
     mkdirexists(home + "/.rookie")
     mkdirexists(home + "/.rookie/definitions")
@@ -106,8 +119,12 @@ def init():
     file_overwrite(home + "/.rookie/latest_generation", "0")
 
 
+# function for defining packages
+# this was used before repositories were added
 def create(q):
+    # there are other package types but they can only be added by repos not defined locally
     valid_package_types = ["script", "appimage", "local"]
+    # the package types "script" and "appimage" are depreciated, use versioned_script and versioned_appimage
     need_url_types = ["script", "appimage"]
     need_local_types = ["local"]
     if os.path.isdir(home + "/.rookie/definitions"):
