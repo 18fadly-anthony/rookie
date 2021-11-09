@@ -7,10 +7,11 @@
 - Depends python3 and the requests library
 
 ```
-$ git clone --depth 1 https://github.com/18fadly-anthony/rookie
-$ ./rookie.py --init
-$ ./rookie.py -c rookie local $(pwd)/rookie.py
-$ ./rookie.py -i rookie
+git clone --depth 1 https://github.com/18fadly-anthony/rookie
+cd rookie
+./rookie.py --init
+./rookie.py -c rookie local $(pwd)/rookie.py
+./rookie.py -i rookie
 ```
 
 - Then add ~/.rookie/bin to PATH
@@ -18,8 +19,8 @@ $ ./rookie.py -i rookie
 ## Usage
 
 ```
-$ rookie --add-repo example https://18fadly-anthony.github.io/rookie-repo-example/
-$ rookie --update-repos
-$ rookie -i neofetch           # install a package
-$ rookie -r neofetch           # remove a package
+rookie --add-repo example https://18fadly-anthony.github.io/rookie-repo-example/
+rookie --update-repos
+rookie -i neofetch           # install a package
+rookie -r neofetch           # remove a package
 ```
