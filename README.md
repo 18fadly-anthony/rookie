@@ -1,4 +1,4 @@
-# RookiePM: Yet another [Nix](nixos.org) inspired package manager
+# RookiePM: Yet another [Nix](https://nixos.org) inspired package manager
 
 ## Installation
 
