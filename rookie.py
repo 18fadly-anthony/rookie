@@ -242,7 +242,7 @@ def update_package(package):
 def create_appimage_wrapper(wrapper_path, appimage_path):
     file_overwrite(wrapper_path, '#!/bin/sh')
     file_append(wrapper_path, '\n')
-    file_append(wrapper_path, 'appimage-run ' + appimage_path)
+    file_append(wrapper_path, appimage_path)
 
 
 def update_appimage(package):
