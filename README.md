@@ -12,10 +12,8 @@ Put add rookie.py to your PATH, alternatively you can install rookie with itself
 
 ```
 $ ./rookie.py --init
-
-$ ./rookie.py --create rookie.py local $(pwd)/rookie.py
-
-$ ./rookie.py --install rookie.py
+$ ./rookie.py -c rookie local $(pwd)/rookie.py
+$ ./rookie.py -i rookie
 ```
 
 Then add ~/.rookie/bin to PATH
@@ -23,19 +21,8 @@ Then add ~/.rookie/bin to PATH
 ## Usage
 
 ```
-$ rookie.py --add-repo example https://18fadly-anthony.github.io/rookie-repo-example/
-
-$ rookie.py --update-repos
-
-$ rookie.py --list-definitions # look at the pacakges in the repo
-
-$ rookie.py --install neofetch # install a package
-
-$ rookie.py --remove neofetch # remove a package
-
-$ rookie.py --list-generations # look at the generations
-
-$ rookie.py --switch <generation> # switch generations
+$ rookie --add-repo example https://18fadly-anthony.github.io/rookie-repo-example/
+$ rookie --update-repos
+$ rookie -i neofetch           # install a package
+$ rookie -r neofetch           # remove a package
 ```
-
-Appimage support requires appimage-run
