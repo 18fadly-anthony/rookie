@@ -1,22 +1,19 @@
-# RookiePM: Yet another [Nix](https://nixos.org) inspired package manager
+# RookiePM
+
+- Yet another [Nix](https://nixos.org) inspired package manager
 
 ## Installation
 
-Install python3 and requests, in many GNU/Linux distros, requests is in the python standard library but on NixOS it is not
+- Depends python3 and the requests library
 
 ```
 $ git clone --depth 1 https://github.com/18fadly-anthony/rookie
-```
-
-Put add rookie.py to your PATH, alternatively you can install rookie with itself like this:
-
-```
 $ ./rookie.py --init
 $ ./rookie.py -c rookie local $(pwd)/rookie.py
 $ ./rookie.py -i rookie
 ```
 
-Then add ~/.rookie/bin to PATH
+- Then add ~/.rookie/bin to PATH
 
 ## Usage
 
