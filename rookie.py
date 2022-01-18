@@ -8,10 +8,15 @@
 import os
 import argparse
 import re
-import requests
 import hashlib
 import shutil
 import sys
+
+try:
+    import requests
+    can_download = True
+except ImportError:
+    can_download = False
 
 home = os.path.expanduser('~')
 rookiedir = home + "/.rookie"
@@ -58,6 +63,10 @@ def file_read(filename):
 
 
 def download_file(url, dest_path):
+    if not can_download:
+        print("Please install the requests library to enable download support")
+        exit()
+
     r = requests.get(url)
 
     file_overwrite(dest_path, r.content.decode("utf-8").strip('\n'))
@@ -66,6 +75,9 @@ def download_file(url, dest_path):
 # When downloading files that are not text (e.g. appimages)
 # things like " r.content.decode("utf-8").strip('\n')" do not apply
 def download_binary(url, dest_path):
+    if not can_download:
+        print("Please install the requests library to enable download support")
+        exit()
     r = requests.get(url)
 
     with open(dest_path, 'wb') as f:
