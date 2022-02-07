@@ -566,7 +566,7 @@ def main():
     # Define Arguments
     parser = argparse.ArgumentParser(
         description='''RookiePM: Yet Another Nix/Guix Inspired Package Manager''',
-        epilog="""Copyright (C) 2021 Anthony Fadly""")
+        epilog="""Copyright (C) 2022 Anthony Fadly""")
 
     parser.add_argument('--init', action='store_true', help='Setup RookiePM')
     parser.add_argument('-c', '--create', metavar=('<package>', '<type>', '<url>'), nargs=3, type=str, default="", help='Define <package> of <type>, with <url>')

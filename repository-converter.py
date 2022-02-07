@@ -66,7 +66,7 @@ def convert_repo(directory, output):
 def main():
     parser = argparse.ArgumentParser(
         description = '''Repo converter for RookiePM''',
-        epilog = """Copyright (C) 2021 Anthony Fadly""")
+        epilog = """Copyright (C) 2022 Anthony Fadly""")
 
     parser.add_argument('-d', '--directory', metavar = '<directory>', nargs = 1,
                         type = str, default = [home + "/.rookie/definitions"],
