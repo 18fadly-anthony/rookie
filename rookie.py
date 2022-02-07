@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
 
-# Copyright (c) 2021 Anthony Fadly (18fadly.anthony@gmail.com)
+# Copyright (c) 2022 Anthony Fadly (18fadly.anthony@gmail.com)
 # This program is licensed under GNU LGPL
 # You are free to copy, modify, and redistribute the code.
 # See COPYING file.
 
 import os
-import argparse
 import re
-import hashlib
-import shutil
 import sys
+import json
+import shutil
+import hashlib
+import argparse
 
 try:
     import requests
