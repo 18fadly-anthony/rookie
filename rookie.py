@@ -208,11 +208,8 @@ def switch_to_generation(new_gen):
     os.symlink(new_gen, rookiedir + "/bin")
 
 
-def install_package(package):
-    # Validate package defined
-    package_name = package[0]
+def validate_package_defined(package_name):
     if os.path.exists(defdir + "definitions.json"):
-        # TODO set destination when adding config type?
         definitions = json.loads(file_read(defdir + "definitions.json"))
         found_package = False
         for i in definitions:
@@ -221,33 +218,45 @@ def install_package(package):
                 found_package = True
             except KeyError:
                 pass
-        if not found_package:
-            print("Error: " + package_name + " is not defined, try: --create")
-    elif os.path.isdir(home + "/.rookie/definitions/" + package[0]):
-        destination = os.path.expanduser(file_read(defdir + package_name + "/destination"))
-        if os.path.isdir(home + "/.rookie/store/" + package[0]):
-            package_store_dir = rookiedir + "/store/" + package_name
-            package_type = file_read(defdir + package_name + "/type")
-            gendir = rookiedir + "/generations/"
-            new_gen = gendir + str(int(file_read(rookiedir + "/latest_generation")) + 1)
-            make_new_generation()
-            if os.path.isfile(new_gen + "/" + package_name):
-                os.remove(new_gen + "/" + package_name)
-            if package_type != "config":
-                os.symlink(os.readlink(package_store_dir + "/latest"), new_gen + "/" + package_name)
-            else:
-                destdir = os.path.dirname(destination)
-                if not os.path.exists(destdir):
-                    os.makedirs(destdir)
-                if os.path.isfile(destination):
-                    os.remove(destination)
-                os.symlink(os.readlink(package_store_dir + "/latest"), destination)
-            switch_to_generation(new_gen)
+        if found_package:
+            return True
         else:
-            update_package(package)
+            return False
+    elif os.path.isdir(home + "/.rookie/definitions/" + package_name):
+        return True
     else:
-        print("Error: " + package[0] + " is not defined, try: --create")
+        return False
+
+
+def install_package(package):
+    package_name = package[0]
+
+    if not validate_package_defined(package_name):
+        print("Error: " + package_name + " is not defined, try: --create")
         exit()
+
+    if os.path.isdir(home + "/.rookie/store/" + package[0]):
+        package_store_dir = rookiedir + "/store/" + package_name
+        package_type = file_read(defdir + package_name + "/type")
+        gendir = rookiedir + "/generations/"
+        new_gen = gendir + str(int(file_read(rookiedir + "/latest_generation")) + 1)
+        make_new_generation()
+        if os.path.isfile(new_gen + "/" + package_name):
+            os.remove(new_gen + "/" + package_name)
+        if package_type != "config":
+            os.symlink(os.readlink(package_store_dir + "/latest"), new_gen + "/" + package_name)
+        # TODO config type
+        #else:
+            #destination = os.path.expanduser(file_read(defdir + package_name + "/destination"))
+            #destdir = os.path.dirname(destination)
+            #if not os.path.exists(destdir):
+                #os.makedirs(destdir)
+            #if os.path.isfile(destination):
+                #os.remove(destination)
+            #os.symlink(os.readlink(package_store_dir + "/latest"), destination)
+        switch_to_generation(new_gen)
+    else:
+        update_package(package)
 
 
 def update_package(package):
