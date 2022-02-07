@@ -144,18 +144,24 @@ def create(q):
         if q[1] in valid_package_types:
             if q[1] in need_url_types:
                 if validate_url(q[2]):
-                    mkdirexists(home + "/.rookie/definitions/" + q[0])
-                    file_overwrite(home + "/.rookie/definitions/" + q[0] + "/name", q[0])
-                    file_overwrite(home + "/.rookie/definitions/" + q[0] + "/type", q[1])
-                    file_overwrite(home + "/.rookie/definitions/" + q[0] + "/url", q[2])
+                    package = {q[0]: [{'name': q[0]}, {'url': q[2]}, {'type': q[1]}]}
+                    if os.path.exists(defdir + "definitions.json"):
+                        definitions = json.loads(file_read(defdir + "definitions.json"))
+                        definitions.append(package)
+                        file_overwrite(defdir + "definitions.json", json.dumps(definitions))
+                    else:
+                        file_overwrite(defdir + "definitions.json", json.dumps(package))
                 else:
                     print("Error: url is not valid")
             elif q[1] in need_local_types:
                 if os.path.isfile(q[2]):
-                    mkdirexists(home + "/.rookie/definitions/" + q[0])
-                    file_overwrite(home + "/.rookie/definitions/" + q[0] + "/name", q[0])
-                    file_overwrite(home + "/.rookie/definitions/" + q[0] + "/type", q[1])
-                    file_overwrite(home + "/.rookie/definitions/" + q[0] + "/url", q[2])
+                    package = {q[0]: [{'name': q[0]}, {'url': q[2]}, {'type': q[1]}]}
+                    if os.path.exists(defdir + "definitions.json"):
+                        definitions = json.loads(file_read(defdir + "definitions.json"))
+                        definitions.append(package)
+                        file_overwrite(defdir + "definitions.json", json.dumps(definitions))
+                    else:
+                        file_overwrite(defdir + "definitions.json", json.dumps(package))
                 else:
                     print("Error: file does not exist")
         else:
