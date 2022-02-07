@@ -12,6 +12,17 @@ import argparse
 
 home = os.path.expanduser('~')
 
+def reverse_basename(path):
+    if not "/" in path:
+        return path
+    basename = os.path.basename(path)
+    l = ""
+    for i in path.split('/'):
+        if i != basename:
+            l += i
+            l += "/"
+    return l
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -19,17 +30,23 @@ def main():
         epilog = """Copyright (C) 2021 Anthony Fadly""")
 
     parser.add_argument('-d', '--directory', metavar = '<directory>', nargs = 1,
-                        type = str, default = home + "/.rookie/definitions",
+                        type = str, default = [home + "/.rookie/definitions"],
                         help = "directory with old definitions")
 
     parser.add_argument('-o', '--output-file', metavar = '<output file>', nargs = 1,
-                        type = str, default = home + "/.rookie/definitions/definitions.json",
+                        type = str, default = [home + "/.rookie/definitions/definitions.json"],
                         help = "output file")
 
     args = parser.parse_args()
 
-    print(args.directory)
-    print(args.output_file)
+    if not os.path.exists(args.directory[0]):
+        print("Error: directory not found " + args.directory[0])
+        exit()
+
+    if not os.path.exists(reverse_basename(args.output_file[0])):
+        print("Error: directory not found " + reverse_basename(args.output_file[0]))
+        exit()
+
 
 
 if __name__ == "__main__":
