@@ -214,7 +214,7 @@ def validate_package_defined(package_name):
         found_package = False
         for i in definitions:
             try:
-                x = (i[package_name])
+                pkginfo = (i[package_name])
                 found_package = True
             except KeyError:
                 pass
@@ -222,7 +222,7 @@ def validate_package_defined(package_name):
             return True
         else:
             return False
-    elif os.path.isdir(home + "/.rookie/definitions/" + package_name):
+    elif os.path.isdir(defdir + package_name):
         return True
     else:
         return False
@@ -237,7 +237,7 @@ def install_package(package):
 
     if os.path.isdir(home + "/.rookie/store/" + package[0]):
         package_store_dir = rookiedir + "/store/" + package_name
-        package_type = file_read(defdir + package_name + "/type")
+        package_type = get_package_type(package_name)
         gendir = rookiedir + "/generations/"
         new_gen = gendir + str(int(file_read(rookiedir + "/latest_generation")) + 1)
         make_new_generation()
@@ -259,9 +259,35 @@ def install_package(package):
         update_package(package)
 
 
+def get_package_url(package_name):
+    if os.path.exists(defdir + "definitions.json"):
+        definitions = json.loads(file_read(defdir + "definitions.json"))
+        for i in definitions:
+            try:
+                pkginfo = (i[package_name])
+                return pkginfo[1]['url']
+            except KeyError:
+                pass
+    else:
+        return file_read(defdir + package_name + "/url")
+
+
+def get_package_type(package_name):
+    if os.path.exists(defdir + "definitions.json"):
+        definitions = json.loads(file_read(defdir + "definitions.json"))
+        for i in definitions:
+            try:
+                pkginfo = (i[package_name])
+                return pkginfo[2]['type']
+            except KeyError:
+                pass
+    else:
+        return file_read(defdir + package_name + "/url")
+
+
 def update_package(package):
     package_name = package[0]
-    package_type = file_read(defdir + package_name + "/type")
+    package_type = get_package_type(package_name)
     if package_type == "script":
         update_script(package)
     elif package_type == "appimage":
@@ -289,7 +315,7 @@ def create_appimage_wrapper(wrapper_path, appimage_path):
 def update_appimage(package):
     package_name = package[0]
     print("Downloading package: " + package_name + "...")
-    download_binary(file_read(rookiedir + "/definitions/" + package_name + "/url"), rookiedir + "/tmp/" + package_name)
+    download_binary(get_package_url(package_name), rookiedir + "/tmp/" + package_name)
     package_store_dir = rookiedir + "/store/" + package_name
     mkdirexists(package_store_dir)
     package_hash = hash_file(rookiedir + "/tmp/" + package_name)
@@ -317,7 +343,7 @@ def update_appimage(package):
 def update_script(package):
     package_name = package[0]
     print("Downloading package: " + package_name + "...")
-    download_file(file_read(rookiedir + "/definitions/" + package_name + "/url"), rookiedir + "/tmp/" + package_name)
+    download_file(get_package_url(package_name), rookiedir + "/tmp/" + package_name)
 
     package_store_dir = rookiedir + "/store/" + package_name
 
@@ -515,7 +541,7 @@ def remove(package):
     package_list = os.listdir(rookiedir + "/bin")
     gendir = rookiedir + "/generations/"
     new_gen = gendir + str(int(os.path.basename(file_read(rookiedir + "/current_generation"))) + 1)
-    package_type = file_read(defdir + package_name + "/type")
+    package_type = get_package_type(package_name)
     if package_type != "config":
         if package_name in package_list:
             make_new_generation()
