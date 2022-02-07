@@ -41,12 +41,26 @@ def tree_dirs(path):
     return dir_list
 
 
+def file_read(filename):
+    f = open(filename, "r")
+    return f.read()
+
+
+def file_overwrite(filename, contents):
+    f = open(filename, "w")
+    f.write(contents)
+    f.close()
+
+
 def convert_repo(directory, output):
     result = []
     for i in tree_dirs(directory):
-        result.append({os.path.basename(i)})
-        #print(tree_files(i))
-    print(result)
+        package_name = os.path.basename(i)
+        package = {package_name:[]}
+        for j in tree_files(i):
+            package[package_name].append({os.path.basename(j): file_read(j)})
+        result.append(package)
+    return json.dumps(result)
 
 
 def main():
@@ -64,16 +78,19 @@ def main():
 
     args = parser.parse_args()
 
-    if not os.path.exists(args.directory[0]):
-        print("Error: directory not found " + args.directory[0])
+    directory = args.directory[0]
+    out = args.output_file[0]
+
+    if not os.path.exists(directory):
+        print("Error: directory not found " + directory)
         exit()
 
-    if not os.path.exists(reverse_basename(args.output_file[0])):
-        print("Error: directory not found " + reverse_basename(args.output_file[0]))
+    if not os.path.exists(reverse_basename(out)):
+        print("Error: directory not found " + reverse_basename(out))
         exit()
 
-    convert_repo(args.directory[0], args.output_file[0])
-
+    file_overwrite(out, convert_repo(directory, out))
+    print("Wrote new repository to " + out)
 
 
 if __name__ == "__main__":
