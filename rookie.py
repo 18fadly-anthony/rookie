@@ -148,9 +148,9 @@ def create(q):
                     if os.path.exists(defdir + "definitions.json"):
                         definitions = json.loads(file_read(defdir + "definitions.json"))
                         definitions.append(package)
-                        file_overwrite(defdir + "definitions.json", json.dumps(definitions))
                     else:
-                        file_overwrite(defdir + "definitions.json", json.dumps(package))
+                        definitions = package
+                    file_overwrite(defdir + "definitions.json", json.dumps(definitions))
                 else:
                     print("Error: url is not valid")
             elif q[1] in need_local_types:
@@ -265,7 +265,11 @@ def get_package_url(package_name):
         for i in definitions:
             try:
                 pkginfo = (i[package_name])
-                return pkginfo[1]['url']
+                for j in pkginfo:
+                    try:
+                        return j['url']
+                    except:
+                        pass
             except KeyError:
                 pass
     else:
@@ -278,11 +282,49 @@ def get_package_type(package_name):
         for i in definitions:
             try:
                 pkginfo = (i[package_name])
-                return pkginfo[2]['type']
+                for j in pkginfo:
+                    try:
+                        return j['type']
+                    except:
+                        pass
             except KeyError:
                 pass
     else:
-        return file_read(defdir + package_name + "/url")
+        return file_read(defdir + package_name + "/type")
+
+
+def get_package_version(package_name):
+    if os.path.exists(defdir + "definitions.json"):
+        definitions = json.loads(file_read(defdir + "definitions.json"))
+        for i in definitions:
+            try:
+                pkginfo = (i[package_name])
+                for j in pkginfo:
+                    try:
+                        return j['version']
+                    except:
+                        pass
+            except KeyError:
+                pass
+    else:
+        return file_read(defdir + package_name + "/version")
+
+
+def get_package_depends(package_name):
+    if os.path.exists(defdir + "definitions.json"):
+        definitions = json.loads(file_read(defdir + "definitions.json"))
+        for i in definitions:
+            try:
+                pkginfo = (i[package_name])
+                for j in pkginfo:
+                    try:
+                        return j['depends'].split('\n')
+                    except:
+                        pass
+            except KeyError:
+                pass
+    else:
+        return file_read_to_array(defdir + package_name + "/depends")
 
 
 def update_package(package):
@@ -368,7 +410,7 @@ def update_script(package):
 def update_versioned_script(package):
     package_name = package[0]
     package_store_dir = rookiedir + "/store/" + package_name
-    repo_version = int(file_read(rookiedir + "/definitions/" + package_name + "/version"))
+    repo_version = int(get_package_version(package_name))
     if os.path.isdir(package_store_dir):
         if os.path.isfile(package_store_dir + "/latest_hash"):
             package_hash = file_read(package_store_dir + "/latest_hash")
@@ -379,7 +421,7 @@ def update_versioned_script(package):
                         return
 
     print("Downloading package: " + package_name + "...")
-    download_file(file_read(rookiedir + "/definitions/" + package_name + "/url"), rookiedir + "/tmp/" + package_name)
+    download_file(get_package_url(package_name), rookiedir + "/tmp/" + package_name)
     package_hash = hash_file(rookiedir + "/tmp/" + package_name)
     mkdirexists(package_store_dir)
     mkdirexists(package_store_dir + "/" + package_hash)
@@ -402,7 +444,7 @@ def update_versioned_script(package):
 def update_versioned_appimage(package):
     package_name = package[0]
     package_store_dir = rookiedir + "/store/" + package_name
-    repo_version = int(file_read(rookiedir + "/definitions/" + package_name + "/version"))
+    repo_version = int(get_package_version(package_name))
     if os.path.isdir(package_store_dir):
         if os.path.isfile(package_store_dir + "/latest_hash"):
             package_hash = file_read(package_store_dir + "/latest_hash")
@@ -412,7 +454,7 @@ def update_versioned_appimage(package):
                     if not repo_version > cur_version:
                         return
     print("Downloading package: " + package_name + "...")
-    download_binary(file_read(rookiedir + "/definitions/" + package_name + "/url"), rookiedir + "/tmp/" + package_name)
+    download_binary(get_package_url(package_name), rookiedir + "/tmp/" + package_name)
     package_hash = hash_file(rookiedir + "/tmp/" + package_name)
     mkdirexists(package_store_dir)
     mkdirexists(package_store_dir + "/" + package_hash)
@@ -438,7 +480,7 @@ def update_meta(package):
     package_store_dir = rookiedir + "/store/" + package_name
     if os.path.isdir(package_store_dir):
         return
-    dependencies = read_file_to_array(rookiedir + "/definitions/" + package_name + "/depends")
+    dependencies = get_package_depends(package_name)
     for i in dependencies:
         if not os.path.isdir(defdir + i):
             print("Error: " + package_name + " depends " + i + " but it is not defined")
@@ -450,7 +492,7 @@ def update_meta(package):
 def update_config(package):
     package_name = package[0]
     package_store_dir = rookiedir + "/store/" + package_name
-    repo_version = int(file_read(rookiedir + "/definitions/" + package_name + "/version"))
+    repo_version = int(get_package_version(package_name))
     if os.path.isdir(package_store_dir):
         if os.path.isfile(package_store_dir + "/latest_hash"):
             package_hash = file_read(package_store_dir + "/latest_hash")
@@ -460,7 +502,7 @@ def update_config(package):
                     if not repo_version > cur_version:
                         return
     print("Downloading package: " + package_name + "...")
-    download_file(file_read(rookiedir + "/definitions/" + package_name + "/url"), rookiedir + "/tmp/" + package_name)
+    download_file(get_package_url(package_name), rookiedir + "/tmp/" + package_name)
     package_hash = hash_file(rookiedir + "/tmp/" + package_name)
     mkdirexists(package_store_dir)
     mkdirexists(package_store_dir + "/" + package_hash)
@@ -479,7 +521,7 @@ def update_config(package):
 
 def update_local(package):
     package_name = package[0]
-    shutil.copyfile(file_read(rookiedir + "/definitions/" + package_name + "/url"), rookiedir + "/tmp/" + package_name)
+    shutil.copyfile(get_package_url(package_name), rookiedir + "/tmp/" + package_name)
     package_store_dir = rookiedir + "/store/" + package_name
     mkdirexists(package_store_dir)
     package_hash = hash_file(rookiedir + "/tmp/" + package_name)
@@ -500,13 +542,13 @@ def update_local(package):
 def list_packages():
     package_list = os.listdir(rookiedir + "/bin")
     for i in package_list:
-        print(i + " (" + file_read(rookiedir + "/definitions/" + i + "/type") + ")")
+        print(i + " (" + get_package_type(package_name) + ")")
 
 
 def list_definitions():
     def_list = os.listdir(rookiedir + "/definitions")
     for i in def_list:
-        print(i + " (" + file_read(rookiedir + "/definitions/" + i + "/type") + ")")
+        print(i + " (" + get_package_type(package_name) + ")")
 
 
 def list_generations():
@@ -547,11 +589,12 @@ def remove(package):
             make_new_generation()
             os.remove(new_gen + "/" + package_name)
             switch_to_generation(new_gen)
-    else:
-        destination = os.path.expanduser(file_read(defdir + package_name + "/destination"))
-        if os.path.isfile(destination):
-            if os.path.islink(destination):
-                os.remove(destination)
+    # TODO config
+    #else:
+        #destination = os.path.expanduser(file_read(defdir + package_name + "/destination"))
+        #if os.path.isfile(destination):
+            #if os.path.islink(destination):
+                #os.remove(destination)
 
 
 def upgrade():
